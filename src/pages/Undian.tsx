@@ -119,9 +119,10 @@ const Undian = () => {
             <CardTitle>Riwayat Undian</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              Fitur undian arisan akan segera tersedia.
-            </p>
+            {/* Riwayat undian uang */}
+            <RiwayatUndianTable kategori="uang" periodeId={periodeId} />
+            {/* Riwayat undian barang */}
+            <RiwayatUndianTable kategori="barang" periodeId={periodeId} />
           </CardContent>
         </Card>
       </div>
@@ -183,5 +184,109 @@ const Undian = () => {
     </div>
   );
 };
+
+// Komponen tabel riwayat undian
+type RiwayatUndianTableProps = {
+  kategori: 'uang' | 'barang';
+  periodeId: string | null;
+};
+
+function RiwayatUndianTable({ kategori, periodeId }: RiwayatUndianTableProps) {
+  const { data, isLoading, error } = useRiwayatUndian(periodeId, kategori);
+  return (
+    <div className="mb-6">
+      <h3 className="font-semibold mb-2 text-primary">
+        Riwayat Undian {kategori === 'uang' ? 'Uang' : 'Barang'}
+      </h3>
+      {isLoading ? (
+        <p className="text-muted-foreground text-sm">Memuat...</p>
+      ) : error ? (
+        <p className="text-red-500 text-sm">Gagal memuat data: {error.message}</p>
+      ) : !data || data.length === 0 ? (
+        <p className="text-muted-foreground text-sm">Belum ada riwayat undian.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm border rounded-lg">
+            <thead>
+              <tr className="bg-muted">
+                <th className="px-2 py-1 border">No</th>
+                <th className="px-2 py-1 border">Nama</th>
+                <th className="px-2 py-1 border">Tanggal</th>
+                <th className="px-2 py-1 border">Status</th>
+                <th className="px-2 py-1 border">Catatan</th>
+                <th className="px-2 py-1 border">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, i) => (
+                <tr key={row.id} className={row.status_konfirmasi === 'disetujui' ? 'bg-green-50' : row.status_konfirmasi === 'ditolak' ? 'bg-red-50' : ''}>
+                  <td className="px-2 py-1 border text-center">{i + 1}</td>
+                  <td className="px-2 py-1 border">{row.nama}</td>
+                  <td className="px-2 py-1 border">{new Date(row.tanggal_undi).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                  <td className="px-2 py-1 border capitalize font-semibold">
+                    {row.status_konfirmasi}
+                  </td>
+                  <td className="px-2 py-1 border">{row.catatan ?? '-'}</td>
+                  <td className="px-2 py-1 border text-center">
+                    {row.status_konfirmasi === 'menunggu' && (
+                      <div className="flex gap-1 justify-center">
+                        <button
+                          className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs"
+                          onClick={async () => {
+                            if (!window.confirm('Setujui pemenang ini?')) return;
+                            try {
+                              await import('@/integrations/supabase/updateHasilUndian').then(mod => mod.updateHasilUndian({ id: row.id, status_konfirmasi: 'disetujui' }));
+                              alert('Pemenang disetujui!');
+                              refetch();
+                            } catch (e) {
+                              alert('Gagal setujui: ' + (e as any)?.message);
+                            }
+                          }}
+                        >
+                          Setujui
+                        </button>
+                        <button
+                          className="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs"
+                          onClick={async () => {
+                            const alasan = window.prompt('Masukkan catatan/alasan undi ulang:', 'Undi ulang manual oleh admin');
+                            if (!alasan) return;
+                            if (!window.confirm('Tolak dan lakukan undi ulang?')) return;
+                            try {
+                              await import('@/integrations/supabase/updateHasilUndian').then(mod => mod.updateHasilUndian({ id: row.id, status_konfirmasi: 'ditolak', catatan: alasan }));
+                              alert('Pemenang ditolak, silakan lakukan undian ulang.');
+                              refetch();
+                            } catch (e) {
+                              alert('Gagal: ' + (e as any)?.message);
+                            }
+                          }}
+                        >
+                          Undi Ulang
+                        </button>
+                      </div>
+                    )}
+                    {row.status_konfirmasi === 'disetujui' && (
+                      <button
+                        className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs"
+                        onClick={() => {
+                          // NOTE: no_wa belum ada di row, harus join ke table anggota/profiles jika ingin otomatis
+                          // Sementara, tampilkan alert atau gunakan window.open ke WhatsApp web dengan pesan default
+                          const pesan = `Selamat ${row.nama}! Anda terpilih sebagai pemenang undian arisan kategori ${row.kategori.toUpperCase()} periode ini.`;
+                          // window.open(`https://wa.me/<NO_WA>?text=${encodeURIComponent(pesan)}`);
+                          alert('Fitur Kirim WA:\n' + pesan + '\n\n(No WA belum tersedia di data, silakan copy pesan ini dan kirim manual)');
+                        }}
+                      >
+                        Kirim WA
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default Undian;
