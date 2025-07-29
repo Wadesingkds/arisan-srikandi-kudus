@@ -6,19 +6,24 @@ import { Badge } from "@/components/ui/badge";
 
 import { useState } from "react";
 import { usePesertaUndian } from "@/integrations/supabase/usePesertaUndian";
-
-const periodeIdDummy = "PERIODE_ID_AKTIF"; // TODO: ganti dengan id periode aktif dari database
+import { usePeriodeUndianAktif } from "@/integrations/supabase/usePeriodeUndianAktif";
+import { saveHasilUndian } from "@/integrations/supabase/saveHasilUndian";
 
 const Undian = () => {
   // State modal: 'uang' | 'barang' | null
   const [openModal, setOpenModal] = useState<'uang'|'barang'|null>(null);
   // State pemenang (nama)
   const [winner, setWinner] = useState<string>("");
+  // Simpan user_id pemenang untuk penyimpanan
+  const [winnerId, setWinnerId] = useState<string>("");
   // State exclude id untuk undi ulang
   const [excludedId, setExcludedId] = useState<string|null>(null);
+  // Ambil periode undian aktif
+  const periodeAktif = usePeriodeUndianAktif();
+  const periodeId = periodeAktif.data?.id ?? null;
   // Ambil peserta undian uang/barang
-  const pesertaUang = usePesertaUndian(periodeIdDummy, 'uang');
-  const pesertaBarang = usePesertaUndian(periodeIdDummy, 'barang');
+  const pesertaUang = usePesertaUndian(periodeId, 'uang');
+  const pesertaBarang = usePesertaUndian(periodeId, 'barang');
 
   // Handler jalankan undian
   function handleUndian(kategori: 'uang'|'barang') {
@@ -37,6 +42,7 @@ const Undian = () => {
     }
     const rand = Math.floor(Math.random() * filtered.length);
     setWinner(filtered[rand].nama);
+    setWinnerId(filtered[rand].user_id);
     setExcludedId(filtered[rand].user_id);
     setOpenModal(kategori);
   }
@@ -61,12 +67,17 @@ const Undian = () => {
             </Link>
             <h1 className="text-2xl font-bold">Undian Arisan</h1>
           </div>
+          {!periodeId && (
+            <div className="text-sm text-red-500 font-semibold mr-4">
+              Tidak ada periode undian aktif. Silakan buat periode baru terlebih dahulu.
+            </div>
+          )}
           <div className="flex gap-2">
-            <Button variant="default" onClick={() => { setExcludedId(null); handleUndian('uang'); }}>
+            <Button variant="default" onClick={() => { setExcludedId(null); handleUndian('uang'); }} disabled={!periodeId}>
               <Shuffle className="h-4 w-4 mr-2" />
               Jalankan Undian Uang
             </Button>
-            <Button variant="secondary" onClick={() => { setExcludedId(null); handleUndian('barang'); }}>
+            <Button variant="secondary" onClick={() => { setExcludedId(null); handleUndian('barang'); }} disabled={!periodeId}>
               <Shuffle className="h-4 w-4 mr-2" />
               Jalankan Undian Barang
             </Button>
@@ -143,7 +154,26 @@ const Undian = () => {
               <Button variant="secondary" size="lg" className="rounded-full px-6 py-2 text-base font-semibold bg-muted text-primary shadow hover:bg-gray-200 transition" onClick={handleUndiUlang}>
                 Undi Ulang
               </Button>
-              <Button variant="default" size="lg" className="rounded-full px-6 py-2 text-base font-semibold bg-primary text-white shadow hover:bg-primary/90 transition" onClick={() => {/* TODO: logic setujui */}}>
+              <Button
+                variant="default"
+                size="lg"
+                className="rounded-full px-6 py-2 text-base font-semibold bg-primary text-white shadow hover:bg-primary/90 transition"
+                onClick={async () => {
+                  if (!periodeId || !openModal || !winnerId || !winner) return;
+                  try {
+                    await saveHasilUndian({
+                      periode_id: periodeId,
+                      kategori: openModal,
+                      anggota_id: winnerId,
+                      nama: winner,
+                    });
+                    setOpenModal(null);
+                    alert('Pemenang berhasil disimpan!');
+                  } catch (e) {
+                    alert('Gagal menyimpan hasil undian: ' + (e as any)?.message);
+                  }
+                }}
+              >
                 Setujui
               </Button>
             </div>
