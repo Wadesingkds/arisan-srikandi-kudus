@@ -2,35 +2,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { 
-  Users, 
-  PiggyBank, 
-  Coins,
-  TrendingUp,
-  Calendar,
-  AlertTriangle,
-  Plus,
-  FileText
-} from "lucide-react";
-
+import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText } from "lucide-react";
 export default function Dashboard() {
   const navigate = useNavigate();
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+  return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-6 bg-sky-700">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">Dashboard RT 04 RW 01</h1>
               <p className="text-primary-foreground/80 text-sm sm:text-base">Demaan, Kudus</p>
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              {new Date().toLocaleDateString('id-ID', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-              })}
+              {new Date().toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
             </Badge>
           </div>
         </div>
@@ -115,35 +104,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 px-3 flex flex-col gap-2"
-                onClick={() => navigate('/setoran')}
-              >
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/setoran')}>
                 <PiggyBank className="h-6 w-6 text-primary" />
                 <span className="text-xs">Catat Setoran</span>
               </Button>
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 px-3 flex flex-col gap-2"
-                onClick={() => navigate('/undian')}
-              >
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/undian')}>
                 <Coins className="h-6 w-6 text-accent" />
                 <span className="text-xs">Undian Arisan</span>
               </Button>
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 px-3 flex flex-col gap-2"
-                onClick={() => navigate('/warga')}
-              >
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/warga')}>
                 <Users className="h-6 w-6 text-warning" />
                 <span className="text-xs">Data Warga</span>
               </Button>
-              <Button 
-                variant="outline" 
-                className="h-auto py-4 px-3 flex flex-col gap-2"
-                onClick={() => navigate('/laporan')}
-              >
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/laporan')}>
                 <FileText className="h-6 w-6 text-success" />
                 <span className="text-xs">Laporan</span>
               </Button>
@@ -180,7 +153,7 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <Button className="w-full" variant="default">
+              <Button variant="default" className="w-full bg-sky-700 hover:bg-sky-600">
                 <Coins className="h-4 w-4 mr-2" />
                 Lakukan Undian
               </Button>
@@ -197,12 +170,22 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {[
-                  { time: "2 jam lalu", action: "Setoran kas", person: "Ibu Sari (D.04-12)", amount: "Rp 12.000" },
-                  { time: "5 jam lalu", action: "Arisan menang", person: "Pak Budi (D.04-08)", amount: "Barang" },
-                  { time: "1 hari lalu", action: "Tabungan lebaran", person: "Ibu Rina (D.04-03)", amount: "Rp 50.000" },
-                ].map((activity, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+                {[{
+                time: "2 jam lalu",
+                action: "Setoran kas",
+                person: "Ibu Sari (D.04-12)",
+                amount: "Rp 12.000"
+              }, {
+                time: "5 jam lalu",
+                action: "Arisan menang",
+                person: "Pak Budi (D.04-08)",
+                amount: "Barang"
+              }, {
+                time: "1 hari lalu",
+                action: "Tabungan lebaran",
+                person: "Ibu Rina (D.04-03)",
+                amount: "Rp 50.000"
+              }].map((activity, index) => <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{activity.action}</p>
                       <p className="text-xs text-muted-foreground">{activity.person}</p>
@@ -211,8 +194,7 @@ export default function Dashboard() {
                     <Badge variant="outline" className="text-xs">
                       {activity.amount}
                     </Badge>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -228,12 +210,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { name: "Ibu Dewi (D.04-15)", debt: "Kas Nov, Listrik Nov", amount: "Rp 10.000" },
-                { name: "Pak Ahmad (D.04-22)", debt: "Kas Okt-Nov, Dana Sosial Nov", amount: "Rp 12.000" },
-                { name: "Ibu Sri (D.04-07)", debt: "Listrik Nov", amount: "Rp 5.000" },
-              ].map((debt, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
+              {[{
+              name: "Ibu Dewi (D.04-15)",
+              debt: "Kas Nov, Listrik Nov",
+              amount: "Rp 10.000"
+            }, {
+              name: "Pak Ahmad (D.04-22)",
+              debt: "Kas Okt-Nov, Dana Sosial Nov",
+              amount: "Rp 12.000"
+            }, {
+              name: "Ibu Sri (D.04-07)",
+              debt: "Listrik Nov",
+              amount: "Rp 5.000"
+            }].map((debt, index) => <div key={index} className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
                   <div className="flex-1">
                     <p className="font-medium text-sm">{debt.name}</p>
                     <p className="text-xs text-muted-foreground">{debt.debt}</p>
@@ -244,13 +233,11 @@ export default function Dashboard() {
                       Reminder
                     </Button>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
 
       </div>
-    </div>
-  );
+    </div>;
 }
