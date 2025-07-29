@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Loader2 } from "lucide-react";
@@ -27,7 +27,16 @@ const Index = () => {
   return (
     <div className="relative">
       {/* Logout Button */}
-      <div className="absolute top-4 right-4 z-10">
+      <div className="flex justify-end gap-2 mb-6">
+        <Link to="/admin/iuran">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="bg-white/80 backdrop-blur-sm hover:bg-white/90"
+          >
+            Admin Iuran
+          </Button>
+        </Link>
         <Button
           variant="outline"
           size="sm"

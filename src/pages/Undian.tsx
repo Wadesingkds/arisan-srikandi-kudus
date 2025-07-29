@@ -4,7 +4,49 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+import { useState } from "react";
+import { usePesertaUndian } from "@/integrations/supabase/usePesertaUndian";
+
+const periodeIdDummy = "PERIODE_ID_AKTIF"; // TODO: ganti dengan id periode aktif dari database
+
 const Undian = () => {
+  // State modal: 'uang' | 'barang' | null
+  const [openModal, setOpenModal] = useState<'uang'|'barang'|null>(null);
+  // State pemenang (nama)
+  const [winner, setWinner] = useState<string>("");
+  // State exclude id untuk undi ulang
+  const [excludedId, setExcludedId] = useState<string|null>(null);
+  // Ambil peserta undian uang/barang
+  const pesertaUang = usePesertaUndian(periodeIdDummy, 'uang');
+  const pesertaBarang = usePesertaUndian(periodeIdDummy, 'barang');
+
+  // Handler jalankan undian
+  function handleUndian(kategori: 'uang'|'barang') {
+    const peserta = kategori === 'uang' ? pesertaUang.data : pesertaBarang.data;
+    if (!peserta || peserta.length === 0) {
+      setWinner('(Tidak ada peserta)');
+      setOpenModal(kategori);
+      return;
+    }
+    // Exclude id jika undi ulang
+    const filtered = excludedId ? peserta.filter(p => p.user_id !== excludedId) : peserta;
+    if (filtered.length === 0) {
+      setWinner('(Tidak ada peserta tersisa)');
+      setOpenModal(kategori);
+      return;
+    }
+    const rand = Math.floor(Math.random() * filtered.length);
+    setWinner(filtered[rand].nama);
+    setExcludedId(filtered[rand].user_id);
+    setOpenModal(kategori);
+  }
+
+  // Handler undi ulang
+  function handleUndiUlang() {
+    if (!openModal) return;
+    handleUndian(openModal);
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6">
       <div className="max-w-4xl mx-auto">
@@ -19,10 +61,16 @@ const Undian = () => {
             </Link>
             <h1 className="text-2xl font-bold">Undian Arisan</h1>
           </div>
-          <Button>
-            <Shuffle className="h-4 w-4 mr-2" />
-            Jalankan Undian
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="default" onClick={() => { setExcludedId(null); handleUndian('uang'); }}>
+              <Shuffle className="h-4 w-4 mr-2" />
+              Jalankan Undian Uang
+            </Button>
+            <Button variant="secondary" onClick={() => { setExcludedId(null); handleUndian('barang'); }}>
+              <Shuffle className="h-4 w-4 mr-2" />
+              Jalankan Undian Barang
+            </Button>
+          </div>
         </div>
 
         {/* Status Cards */}
@@ -66,6 +114,42 @@ const Undian = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal Konfirmasi Pemenang Undian (UI Saja) */}
+      {openModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="relative bg-white/70 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-8 max-w-md w-full transition-all duration-300 animate-scale-in flex flex-col items-center">
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+              {/* Icon trophy elegan */}
+              <span className="inline-block bg-white border border-gray-200 rounded-full p-3 shadow-md">
+                <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+                  <path fill="#fbbf24" d="M7 21v-2a4 4 0 0 1 4-4 4 4 0 0 1 4 4v2"/>
+                  <path stroke="#a21caf" strokeWidth="1.5" d="M7 21v-2a4 4 0 0 1 4-4 4 4 0 0 1 4 4v2"/>
+                  <path stroke="#fbbf24" strokeWidth="1.5" d="M12 17v-4m0 0c-4.418 0-8-1.343-8-3V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5c0 1.657-3.582 3-8 3Z"/>
+                </svg>
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold mb-2 text-center mt-8 text-neutral-800 drop-shadow tracking-wide animate-fade-in">
+              Konfirmasi Pemenang Undian {openModal === 'uang' ? 'Uang' : 'Barang'}
+            </h2>
+            <div className="mb-6 mt-2 text-center">
+              <p className="text-lg text-muted-foreground">Pemenang:</p>
+              <p className="text-3xl font-extrabold text-primary drop-shadow animate-pop-in">{winner || '(nama pemenang)'}</p>
+            </div>
+            <div className="flex gap-4 justify-center w-full mt-4">
+              <Button variant="outline" size="lg" className="rounded-full px-6 py-2 text-base font-semibold border-gray-300 hover:bg-gray-100 transition" onClick={() => setOpenModal(null)}>
+                Batal
+              </Button>
+              <Button variant="secondary" size="lg" className="rounded-full px-6 py-2 text-base font-semibold bg-muted text-primary shadow hover:bg-gray-200 transition" onClick={handleUndiUlang}>
+                Undi Ulang
+              </Button>
+              <Button variant="default" size="lg" className="rounded-full px-6 py-2 text-base font-semibold bg-primary text-white shadow hover:bg-primary/90 transition" onClick={() => {/* TODO: logic setujui */}}>
+                Setujui
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

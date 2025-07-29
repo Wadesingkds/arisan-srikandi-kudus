@@ -10,6 +10,7 @@ import Warga from "./pages/Warga";
 import Setoran from "./pages/Setoran";
 import Undian from "./pages/Undian";
 import Laporan from "./pages/Laporan";
+import AdminIuran from "@/pages/AdminIuran";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/setoran" element={<Setoran />} />
           <Route path="/undian" element={<Undian />} />
           <Route path="/laporan" element={<Laporan />} />
+          <Route path="/admin/iuran" element={<AdminIuran />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
