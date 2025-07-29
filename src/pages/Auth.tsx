@@ -108,7 +108,7 @@ export default function Auth() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Users className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold">RT 04 RW 01</h1>
+            <h1 className="text-2xl font-bold">ARISAN RT 04 RW 01 Demaan Kudus</h1>
           </div>
           <p className="text-muted-foreground">Sistem Arisan & Iuran Demaan, Kudus</p>
         </div>
