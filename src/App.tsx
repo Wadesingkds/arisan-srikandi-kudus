@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Warga from "./pages/Warga";
+import Setoran from "./pages/Setoran";
+import Undian from "./pages/Undian";
+import Laporan from "./pages/Laporan";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +22,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/warga" element={<Warga />} />
+          <Route path="/setoran" element={<Setoran />} />
+          <Route path="/undian" element={<Undian />} />
+          <Route path="/laporan" element={<Laporan />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
