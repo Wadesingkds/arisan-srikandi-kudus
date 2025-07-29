@@ -8,6 +8,7 @@ import { useState } from "react";
 import { usePesertaUndian } from "@/integrations/supabase/usePesertaUndian";
 import { usePeriodeUndianAktif } from "@/integrations/supabase/usePeriodeUndianAktif";
 import { saveHasilUndian } from "@/integrations/supabase/saveHasilUndian";
+import { useRiwayatUndian } from "@/integrations/supabase/useRiwayatUndian";
 
 const Undian = () => {
   // State modal: 'uang' | 'barang' | null
@@ -192,7 +193,7 @@ type RiwayatUndianTableProps = {
 };
 
 function RiwayatUndianTable({ kategori, periodeId }: RiwayatUndianTableProps) {
-  const { data, isLoading, error } = useRiwayatUndian(periodeId, kategori);
+  const { data, isLoading, error, refetch } = useRiwayatUndian(periodeId, kategori);
   return (
     <div className="mb-6">
       <h3 className="font-semibold mb-2 text-primary">
