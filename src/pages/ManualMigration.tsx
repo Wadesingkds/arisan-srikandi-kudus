@@ -35,8 +35,13 @@ export default function ManualMigration() {
   const [pemenang, setPemenang] = useState<Pemenang[]>([]);
   const [tunggakan, setTunggakan] = useState<any[]>([]);
   const [saldo, setSaldo] = useState({
-    kas: 0,
-    bank: 0,
+    arisan: 0,
+    arisanBarang: 0,
+    uangKas: 0,
+    uangListrik: 0,
+    uangSosial: 0,
+    tabunganPiknik: 0,
+    tabunganLebaran: 0,
     total: 0
   });
 
@@ -261,31 +266,81 @@ export default function ManualMigration() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label>Saldo Kas</Label>
+                  <Label>Arisan</Label>
                   <Input 
                     type="number" 
                     placeholder="0"
-                    value={saldo.kas}
-                    onChange={(e) => setSaldo({...saldo, kas: Number(e.target.value), total: Number(e.target.value) + saldo.bank})}
+                    value={saldo.arisan}
+                    onChange={(e) => setSaldo({...saldo, arisan: Number(e.target.value), total: Number(e.target.value) + saldo.arisanBarang + saldo.uangKas + saldo.uangListrik + saldo.uangSosial + saldo.tabunganPiknik + saldo.tabunganLebaran})}
                   />
-                  <CardDescription>Saldo uang tunai di kas</CardDescription>
+                  <CardDescription>Saldo arisan uang yang terkumpul</CardDescription>
                 </div>
                 <div>
-                  <Label>Saldo Bank</Label>
+                  <Label>Arisan Barang</Label>
                   <Input 
                     type="number" 
                     placeholder="0"
-                    value={saldo.bank}
-                    onChange={(e) => setSaldo({...saldo, bank: Number(e.target.value), total: Number(e.target.value) + saldo.kas})}
+                    value={saldo.arisanBarang}
+                    onChange={(e) => setSaldo({...saldo, arisanBarang: Number(e.target.value), total: saldo.arisan + Number(e.target.value) + saldo.uangKas + saldo.uangListrik + saldo.uangSosial + saldo.tabunganPiknik + saldo.tabunganLebaran})}
                   />
-                  <CardDescription>Saldo di rekening bank</CardDescription>
+                  <CardDescription>Saldo arisan barang yang terkumpul</CardDescription>
+                </div>
+                <div>
+                  <Label>Uang Kas</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.uangKas}
+                    onChange={(e) => setSaldo({...saldo, uangKas: Number(e.target.value), total: saldo.arisan + saldo.arisanBarang + Number(e.target.value) + saldo.uangListrik + saldo.uangSosial + saldo.tabunganPiknik + saldo.tabunganLebaran})}
+                  />
+                  <CardDescription>Saldo uang kas RT/RW yang terkumpul</CardDescription>
+                </div>
+                <div>
+                  <Label>Uang Listrik</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.uangListrik}
+                    onChange={(e) => setSaldo({...saldo, uangListrik: Number(e.target.value), total: saldo.arisan + saldo.arisanBarang + saldo.uangKas + Number(e.target.value) + saldo.uangSosial + saldo.tabunganPiknik + saldo.tabunganLebaran})}
+                  />
+                  <CardDescription>Saldo uang listrik yang terkumpul</CardDescription>
+                </div>
+                <div>
+                  <Label>Uang Sosial</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.uangSosial}
+                    onChange={(e) => setSaldo({...saldo, uangSosial: Number(e.target.value), total: saldo.arisan + saldo.arisanBarang + saldo.uangKas + saldo.uangListrik + Number(e.target.value) + saldo.tabunganPiknik + saldo.tabunganLebaran})}
+                  />
+                  <CardDescription>Saldo uang sosial yang terkumpul</CardDescription>
+                </div>
+                <div>
+                  <Label>Tabungan Piknik</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.tabunganPiknik}
+                    onChange={(e) => setSaldo({...saldo, tabunganPiknik: Number(e.target.value), total: saldo.arisan + saldo.arisanBarang + saldo.uangKas + saldo.uangListrik + saldo.uangSosial + Number(e.target.value) + saldo.tabunganLebaran})}
+                  />
+                  <CardDescription>Saldo tabungan piknik peserta</CardDescription>
+                </div>
+                <div>
+                  <Label>Tabungan Lebaran</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.tabunganLebaran}
+                    onChange={(e) => setSaldo({...saldo, tabunganLebaran: Number(e.target.value), total: saldo.arisan + saldo.arisanBarang + saldo.uangKas + saldo.uangListrik + saldo.uangSosial + saldo.tabunganPiknik + Number(e.target.value)})}
+                  />
+                  <CardDescription>Saldo tabungan lebaran peserta</CardDescription>
                 </div>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Total Saldo</span>
+                  <span className="text-sm font-medium">Total Saldo Migrasi</span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
                   Rp {saldo.total.toLocaleString('id-ID')}
@@ -321,13 +376,28 @@ export default function ManualMigration() {
                 <div>
                   <h4 className="font-medium flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-blue-600" />
-                    Saldo Migrasi
+                    Saldo Migrasi per Jenis
                   </h4>
                   <div className="text-sm text-gray-600">
-                    Saldo Kas: Rp {saldo.kas.toLocaleString('id-ID')}
+                    Arisan: Rp {saldo.arisan.toLocaleString('id-ID')}
                   </div>
                   <div className="text-sm text-gray-600">
-                    Saldo Bank: Rp {saldo.bank.toLocaleString('id-ID')}
+                    Arisan Barang: Rp {saldo.arisanBarang.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Uang Kas: Rp {saldo.uangKas.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Uang Listrik: Rp {saldo.uangListrik.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Uang Sosial: Rp {saldo.uangSosial.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Tabungan Piknik: Rp {saldo.tabunganPiknik.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Tabungan Lebaran: Rp {saldo.tabunganLebaran.toLocaleString('id-ID')}
                   </div>
                   <div className="text-sm font-medium text-blue-600">
                     Total: Rp {saldo.total.toLocaleString('id-ID')}

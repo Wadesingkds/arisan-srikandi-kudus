@@ -4,7 +4,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Container, Grid, Main } from "@/components/layouts/Layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FileText, TrendingUp, Users, DollarSign, Trophy, Calendar, Upload, Download, PiggyBank, Coins, CreditCard, Plus } from "lucide-react";
+import { FileText, TrendingUp, Users, DollarSign, Trophy, Calendar, Upload, Download, PiggyBank, Coins, CreditCard, Plus, AlertCircle } from "lucide-react";
 import DrawModal from "./DrawModal";
 
 export default function Dashboard() {
@@ -207,6 +207,13 @@ export default function Dashboard() {
               >
                 <Users className="h-4 w-4 mr-2" />
                 Lihat Peserta
+              </Button>
+              <Button 
+                onClick={() => navigate('/migrasi-saldo')}
+                className="w-full flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                <AlertCircle className="h-4 w-4" />
+                Migrasi Saldo
               </Button>
               <Button 
                 variant="outline" 

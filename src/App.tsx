@@ -14,6 +14,7 @@ import AdminIuran from "@/pages/AdminIuran";
 import Pengeluaran from "./pages/Pengeluaran";
 import Import from "./pages/Import";
 import ManualMigration from "./pages/ManualMigration";
+import MigrasiSaldo from "./pages/MigrasiSaldo";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/pengeluaran" element={<Pengeluaran />} />
           <Route path="/import" element={<Import />} />
           <Route path="/manual-migration" element={<ManualMigration />} />
+          <Route path="/migrasi-saldo" element={<MigrasiSaldo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

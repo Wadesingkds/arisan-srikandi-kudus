@@ -77,7 +77,7 @@ export default function Welcome() {
                 </p>
                 <Button 
                   className="w-full bg-green-500 hover:bg-green-600"
-                  onClick={() => window.location.href = '/dashboard'}
+                  onClick={() => window.location.href = '/'}
                 >
                   Masuk ke Aplikasi
                 </Button>

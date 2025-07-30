@@ -8,6 +8,8 @@ import { useState } from "react";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
+  const [useSimpleMode, setUseSimpleMode] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   if (loading) {
     return (
@@ -25,9 +27,6 @@ const Index = () => {
   const handleSignOut = async () => {
     await signOut();
   };
-
-  const [useSimpleMode, setUseSimpleMode] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <div className="relative">
