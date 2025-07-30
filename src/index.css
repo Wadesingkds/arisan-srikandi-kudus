@@ -111,7 +111,11 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  /* Mobile-specific utilities */
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
   body {
     @apply bg-background text-foreground;
   }

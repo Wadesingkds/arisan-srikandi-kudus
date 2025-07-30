@@ -36,8 +36,7 @@ export default function DataImport() {
           <CardTitle>Import Data Arisan</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          
-        {/* Pilih Jenis Import */}
+          {/* Pilih Jenis Import */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Jenis Data yang akan diimport:</label>
           <div className="space-y-2">
@@ -147,7 +146,8 @@ export default function DataImport() {
             <li>Data akan diproses otomatis</li>
           </ul>
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
