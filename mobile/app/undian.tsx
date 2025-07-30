@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
+  FlatList,
 } from 'react-native';
 import {
   Card,
