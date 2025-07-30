@@ -19,6 +19,8 @@ interface Props {
 const kategoriOptions = [
   { value: 'arisan_uang', label: 'Arisan Uang' },
   { value: 'arisan_barang', label: 'Arisan Barang' },
+  { value: 'uang_listrik', label: 'Uang Listrik' },
+  { value: 'uang_kas', label: 'Uang Kas' },
   { value: 'sosial', label: 'Sosial' },
   { value: 'tabungan_lebaran', label: 'Tabungan Lebaran' },
   { value: 'tabungan_piknik', label: 'Tabungan Piknik' },

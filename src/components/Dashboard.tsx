@@ -146,6 +146,21 @@ export default function Dashboard() {
 
           <Card variant="elevated">
             <CardHeader>
+              <CardTitle>Pengeluaran</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Catat pengeluaran arisan
+              </CardDescription>
+              <Button variant="outline" onClick={() => navigate('/pengeluaran')}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                Catat Pengeluaran
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated">
+            <CardHeader>
               <CardTitle>Laporan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
