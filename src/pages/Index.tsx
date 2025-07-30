@@ -4,12 +4,24 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Loader2, Settings, HelpCircle } from "lucide-react";
 import Dashboard from "@/components/Dashboard";
 import SimpleDashboard from "@/components/SimpleDashboard";
-import { useState } from "react";
+import MobileDashboard from "@/components/MobileDashboard";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
   const [useSimpleMode, setUseSimpleMode] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   if (loading) {
     return (
@@ -27,6 +39,11 @@ const Index = () => {
   const handleSignOut = async () => {
     await signOut();
   };
+
+  // Return mobile dashboard for mobile devices
+  if (isMobile) {
+    return <MobileDashboard />;
+  }
 
   return (
     <div className="relative">
