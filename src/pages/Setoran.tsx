@@ -1,35 +1,59 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Users, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { usePesertaArisan } from "@/integrations/supabase/usePesertaArisan";
+import { useCreateSetoran } from "@/integrations/supabase/useSetoran";
 import { useKategoriIuran } from "@/integrations/supabase/useKategoriIuran";
+import { formatCurrency } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Setoran = () => {
+  const [mode, setMode] = useState<'single' | 'batch'>('single');
   const [anggota, setAnggota] = useState("");
+  const [selectedAnggota, setSelectedAnggota] = useState<string[]>([]);
   const [jenisIuran, setJenisIuran] = useState("");
   const [jumlah, setJumlah] = useState<number | undefined>(undefined);
-  // Untuk deteksi apakah jumlah sudah diedit manual
   const [jumlahManual, setJumlahManual] = useState(false);
-  // Format tanggal: ddmmmmyyyy (misal: 29Jul2025)
-  function getToday() {
-    const now = new Date();
-    const dd = String(now.getDate()).padStart(2, '0');
-    const bulanIndo = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-    const mmmm = bulanIndo[now.getMonth()];
-    const yyyy = now.getFullYear();
-    return `${dd} ${mmmm} ${yyyy}`;
-  }
-  const [tanggal, setTanggal] = useState(getToday());
+  const [tanggal, setTanggal] = useState("");
   const [keterangan, setKeterangan] = useState("");
 
-  // Ambil data kategori iuran dari Supabase
+  const { data: peserta, isLoading: loadingPeserta } = usePesertaArisan();
   const { data: kategoriIuran, isLoading: loadingIuran, error: errorIuran } = useKategoriIuran();
+  const createSetoranMutation = useCreateSetoran();
+
+  const handleBatchSubmit = async () => {
+    if (selectedAnggota.length === 0) {
+      toast.error("Pilih minimal 1 anggota");
+      return;
+    }
+    if (!jenisIuran || !jumlah || !tanggal) {
+      toast.error("Lengkapi semua data");
+      return;
+    }
+
+    try {
+      const promises = selectedAnggota.map(anggotaId => 
+        createSetoranMutation.mutateAsync({
+          warga_id: anggotaId,
+          jenis_iuran: jenisIuran,
+          nominal: jumlah,
+          tanggal: tanggal
+        })
+      );
+      await Promise.all(promises);
+      toast.success(`Berhasil mencatat setoran untuk ${selectedAnggota.length} anggota`);
+      setSelectedAnggota([]);
+      setJenisIuran("");
+      setJumlah(undefined);
+      setTanggal("");
+    } catch (error) {
+      toast.error("Gagal mencatat setoran");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,135 +89,291 @@ const Setoran = () => {
     // setAnggota(""); setJenisIuran(""); setJumlah(undefined); setTanggal(getToday()); setKeterangan("");
   };
 
+  // Format tanggal: ddmmmmyyyy (misal: 29Jul2025)
+  function getToday() {
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const bulanIndo = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const mmmm = bulanIndo[now.getMonth()];
+    const yyyy = now.getFullYear();
+    return `${dd} ${mmmm} ${yyyy}`;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6">
+    <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Kembali
-              </Button>
+            <Link to="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+              <ArrowLeft className="w-4 h-4" />
+              Kembali
             </Link>
             <h1 className="text-2xl font-bold">Catat Setoran</h1>
+          </div>
+        </div>
+
+        {/* Mode Toggle */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-gray-100 rounded-lg p-1 flex">
+            <button
+              type="button"
+              onClick={() => setMode('single')}
+              className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${
+                mode === 'single' 
+                  ? 'bg-white shadow-sm text-blue-600' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              Single
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('batch')}
+              className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${
+                mode === 'batch' 
+                  ? 'bg-white shadow-sm text-blue-600' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Batch
+            </button>
           </div>
         </div>
 
         {/* Content */}
         <Card>
           <CardHeader>
-            <CardTitle>Form Setoran Iuran</CardTitle>
+            <CardTitle>
+              Form Setoran Iuran {mode === 'batch' ? '(Batch)' : '(Single)'}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="overflow-visible">
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              {/* Pilih Anggota */}
-              <div>
-                <label className="block mb-1 font-medium">Nama Anggota</label>
-                <Select value={anggota} onValueChange={setAnggota}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih anggota" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* TODO: Ganti dengan data anggota dari Supabase */}
-                    <SelectItem value="1">Siti Aminah</SelectItem>
-                    <SelectItem value="2">Dewi Lestari</SelectItem>
-                    <SelectItem value="3">Rina Wati</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {/* Jenis Iuran */}
-              <div>
-                <label className="block mb-1 font-medium">Jenis Iuran</label>
-                {loadingIuran ? (
-                  <div className="text-muted-foreground">Memuat data jenis iuran...</div>
-                ) : errorIuran ? (
-                  <div className="text-red-500">Gagal memuat jenis iuran</div>
-                ) : (
-                  <Select value={jenisIuran} onValueChange={(val) => {
-                    setJenisIuran(val);
-                    setJumlahManual(false); // Reset manual jika ganti jenis iuran
-                    // Cari nominal default dari kategoriIuran
-                    const selected = kategoriIuran?.find((item) => item.id.toString() === val);
-                    if (selected && selected.nominal && selected.nominal > 0) {
-                      setJumlah(selected.nominal);
-                    } else {
-                      setJumlah(undefined);
-                    }
-                  }}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih jenis iuran" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {loadingIuran ? (
-                        <SelectItem value="loading">Memuat...</SelectItem>
-                      ) : errorIuran ? (
-                        <SelectItem value="error">Error memuat data</SelectItem>
-                      ) : kategoriIuran && kategoriIuran.length > 0 ? (
-                        kategoriIuran.map((item) => (
-                          <SelectItem key={item.id} value={item.id.toString()}>
-                            {item.nama} - {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}
+          <CardContent>
+            {mode === 'single' ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Anggota */}
+                <div>
+                  <label className="block mb-1 font-medium">Nama Anggota</label>
+                  {loadingPeserta ? (
+                    <div className="text-sm text-gray-500">Memuat data peserta...</div>
+                  ) : (
+                    <Select value={anggota} onValueChange={setAnggota}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih anggota" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {peserta?.map((p) => (
+                          <SelectItem key={p.id} value={p.id.toString()}>
+                            {p.nama}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="empty">Belum ada data jenis iuran</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-              {/* Jumlah Setoran */}
-              <div>
-                <label className="block mb-1 font-medium">Jumlah Setoran</label>
-                <input
-                  type="number"
-                  className="w-full border rounded p-2"
-                  value={jumlah === undefined ? '' : jumlah}
-                  onChange={(e) => {
-                    setJumlah(e.target.valueAsNumber);
-                    setJumlahManual(true);
-                  }}
-                  min="0"
-                  placeholder="Isi jumlah setoran"
-                  disabled={jenisIuran === ""}
-                />
-              </div>
-              {/* Tanggal Setoran */}
-              <div className="flex flex-col items-center">
-                <label className="block mb-1 font-medium text-center">Tanggal Setoran</label>
-                <div className="flex items-center gap-2">
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {/* Jenis Iuran */}
+                <div>
+                  <label className="block mb-1 font-medium">Jenis Iuran</label>
+                  {loadingIuran ? (
+                    <div className="text-muted-foreground">Memuat data jenis iuran...</div>
+                  ) : errorIuran ? (
+                    <div className="text-red-500">Gagal memuat jenis iuran</div>
+                  ) : (
+                    <Select value={jenisIuran} onValueChange={(val) => {
+                      setJenisIuran(val);
+                      setJumlahManual(false); // Reset manual jika ganti jenis iuran
+                      // Cari nominal default dari kategoriIuran
+                      const selected = kategoriIuran?.find((item) => item.id.toString() === val);
+                      if (selected && selected.nominal && selected.nominal > 0) {
+                        setJumlah(selected.nominal);
+                      } else {
+                        setJumlah(undefined);
+                      }
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Pilih jenis iuran" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {loadingIuran ? (
+                          <SelectItem value="loading">Memuat...</SelectItem>
+                        ) : errorIuran ? (
+                          <SelectItem value="error">Error memuat data</SelectItem>
+                        ) : kategoriIuran && kategoriIuran.length > 0 ? (
+                          kategoriIuran.map((item) => (
+                            <SelectItem key={item.id} value={item.id.toString()}>
+                              {item.nama} - {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="empty">Belum ada data jenis iuran</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {/* Jumlah Setoran */}
+                <div>
+                  <label className="block mb-1 font-medium">Jumlah Setoran</label>
+                  <input
+                    type="number"
+                    className="w-full border rounded p-2"
+                    value={jumlah === undefined ? '' : jumlah}
+                    onChange={(e) => {
+                      setJumlah(e.target.valueAsNumber);
+                      setJumlahManual(true);
+                    }}
+                    min="0"
+                    placeholder="Isi jumlah setoran"
+                    disabled={jenisIuran === ""}
+                  />
+                </div>
+                {/* Tanggal Setoran */}
+                <div className="flex flex-col items-center">
+                  <label className="block mb-1 font-medium text-center">Tanggal Setoran</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      className="w-60 border rounded p-2 text-center"
+                      value={tanggal}
+                      onChange={(e) => setTanggal(e.target.value)}
+                      placeholder="dd mmmm yyyy (contoh: 20 Agustus 2025)"
+                      maxLength={25}
+                    />
+                    <CalendarPopover tanggal={tanggal} setTanggal={setTanggal} />
+                  </div>
+                  {/* Validasi format tanggal dd mmmm yyyy */}
+                  {tanggal && !/^\d{2} [A-Za-zÀ-ÿ]+ \d{4}$/.test(tanggal) && (
+                    <div className="text-red-500 text-xs mt-1">Format: 2 digit tanggal + spasi + nama bulan (Indonesia) + spasi + 4 digit tahun. Contoh: 20 Agustus 2025</div>
+                  )}
+                </div>
+                {/* Keterangan */}
+                <div>
+                  <label className="block mb-1 font-medium">Keterangan (opsional)</label>
                   <input
                     type="text"
-                    className="w-60 border rounded p-2 text-center"
-                    value={tanggal}
-                    onChange={(e) => setTanggal(e.target.value)}
-                    placeholder="dd mmmm yyyy (contoh: 20 Agustus 2025)"
-                    maxLength={25}
+                    className="w-full border rounded p-2"
+                    value={keterangan}
+                    onChange={(e) => setKeterangan(e.target.value)}
+                    placeholder="Keterangan tambahan"
                   />
-                  <CalendarPopover tanggal={tanggal} setTanggal={setTanggal} />
                 </div>
-                {/* Validasi format tanggal dd mmmm yyyy */}
-                {tanggal && !/^\d{2} [A-Za-zÀ-ÿ]+ \d{4}$/.test(tanggal) && (
-                  <div className="text-red-500 text-xs mt-1">Format: 2 digit tanggal + spasi + nama bulan (Indonesia) + spasi + 4 digit tahun. Contoh: 20 Agustus 2025</div>
-                )}
+                <Button type="submit" disabled={createSetoranMutation.isPending || !anggota || !jenisIuran || !jumlah || !tanggal}>
+                  {createSetoranMutation.isPending ? "Menyimpan..." : "Simpan Setoran"}
+                </Button>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                {/* Multi-select Anggota */}
+                <div>
+                  <label className="block mb-2 font-medium">Pilih Anggota</label>
+                  <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                    {loadingPeserta ? (
+                      <div className="text-sm text-gray-500">Memuat data peserta...</div>
+                    ) : (
+                      peserta?.map((p) => (
+                        <label key={p.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                          <Checkbox
+                            checked={selectedAnggota.includes(p.id.toString())}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedAnggota([...selectedAnggota, p.id.toString()]);
+                              } else {
+                                setSelectedAnggota(selectedAnggota.filter(id => id !== p.id.toString()));
+                              }
+                            }}
+                          />
+                          <span>{p.nama}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {selectedAnggota.length} anggota terpilih
+                  </div>
+                </div>
+
+                {/* Form untuk semua anggota */}
+                <div className="space-y-4">
+                  {/* Jenis Iuran */}
+                  <div>
+                    <label className="block mb-1 font-medium">Jenis Iuran</label>
+                    {loadingIuran ? (
+                      <div className="text-sm text-gray-500">Memuat data jenis iuran...</div>
+                    ) : (
+                      <Select value={jenisIuran} onValueChange={setJenisIuran}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih jenis iuran" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {loadingIuran ? (
+                            <SelectItem value="loading">Memuat...</SelectItem>
+                          ) : errorIuran ? (
+                            <SelectItem value="error">Error memuat data</SelectItem>
+                          ) : kategoriIuran && kategoriIuran.length > 0 ? (
+                            kategoriIuran.map((item) => (
+                              <SelectItem key={item.id} value={item.id.toString()}>
+                                {item.nama} - {formatCurrency(item.nominal)}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="empty">Belum ada data jenis iuran</SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+
+                  {/* Jumlah */}
+                  <div>
+                    <label className="block mb-1 font-medium">Jumlah Setoran</label>
+                    <input
+                      type="number"
+                      className="w-full border rounded p-2"
+                      value={jumlah === undefined ? '' : jumlah}
+                      onChange={(e) => setJumlah(e.target.valueAsNumber)}
+                      min="0"
+                      placeholder="Isi jumlah setoran"
+                    />
+                  </div>
+
+                  {/* Tanggal */}
+                  <div>
+                    <label className="block mb-1 font-medium">Tanggal Setoran</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        className="flex-1 border rounded p-2"
+                        value={tanggal}
+                        onChange={(e) => setTanggal(e.target.value)}
+                        placeholder="dd mmmm yyyy (contoh: 20 Agustus 2025)"
+                      />
+                      <CalendarPopover tanggal={tanggal} setTanggal={setTanggal} />
+                    </div>
+                  </div>
+
+                  {/* Summary */}
+                  {selectedAnggota.length > 0 && jumlah && (
+                    <div className="bg-blue-50 p-3 rounded-md">
+                      <div className="text-sm font-medium text-blue-800">
+                        Total: {selectedAnggota.length} anggota × {formatCurrency(jumlah)} = {formatCurrency(selectedAnggota.length * jumlah)}
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    onClick={handleBatchSubmit}
+                    disabled={createSetoranMutation.isPending || selectedAnggota.length === 0 || !jenisIuran || !jumlah || !tanggal}
+                  >
+                    {createSetoranMutation.isPending ? "Menyimpan..." : `Simpan ${selectedAnggota.length} Setoran`}
+                  </Button>
+                </div>
               </div>
-              {/* Keterangan */}
-              <div>
-                <label className="block mb-1 font-medium">Keterangan (opsional)</label>
-                <input
-                  type="text"
-                  className="w-full border rounded p-2"
-                  value={keterangan}
-                  onChange={(e) => setKeterangan(e.target.value)}
-                  placeholder="Keterangan tambahan"
-                />
-              </div>
-              <Button type="submit" className="w-full mt-2">
-                Simpan Setoran
-              </Button>
-            </form>
+            )}
           </CardContent>
         </Card>
       </div>
