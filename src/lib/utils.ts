@@ -30,21 +30,30 @@ export function formatDateTime(date: Date): string {
 }
 
 // Validation utilities
-export function validateNIK(nik: string): boolean {
-  // NIK Indonesia harus 16 digit
-  const nikRegex = /^\d{16}$/;
-  return nikRegex.test(nik);
-}
-
 export function validatePhoneNumber(phone: string): boolean {
   // Format nomor HP Indonesia: 08xx-xxxx-xxxx atau +62xxx-xxxx-xxxx
+  // Lebih fleksibel untuk aplikasi arisan
+  if (!phone || phone.trim() === '') return false;
+  const cleanPhone = phone.replace(/[\s-]/g, '');
   const phoneRegex = /^(\+62|62|0)[8-9][0-9]{7,11}$/;
-  return phoneRegex.test(phone.replace(/[\s-]/g, ''));
+  return phoneRegex.test(cleanPhone);
 }
 
 export function validateEmail(email: string): boolean {
+  if (!email || email.trim() === '') return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return emailRegex.test(email.trim());
+}
+
+export function validateName(name: string): boolean {
+  // Validasi nama untuk peserta arisan - minimal 2 karakter, tidak boleh kosong
+  if (!name || name.trim() === '') return false;
+  return name.trim().length >= 2;
+}
+
+export function validateSetoran(amount: number, minAmount = 0): boolean {
+  // Validasi jumlah setoran - harus positif dan di atas minimum
+  return amount > 0 && amount >= minAmount;
 }
 
 // Arisan calculation utilities
