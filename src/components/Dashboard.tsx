@@ -232,10 +232,10 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Utang */}
+        {/* Tunggakan */}
         <Card variant="elevated">
           <CardHeader>
-            <CardTitle>Utang</CardTitle>
+            <CardTitle>Tunggakan</CardTitle>
           </CardHeader>
           <CardContent>
             {[{
