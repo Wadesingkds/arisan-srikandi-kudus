@@ -33,7 +33,7 @@ export default function Dashboard() {
           <Card className="shadow-card hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Warga
+                Total Peserta Arisan
               </CardTitle>
               <Users className="h-4 w-4 text-primary" />
             </CardHeader>
@@ -88,7 +88,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold text-destructive">5</div>
               <p className="text-xs text-muted-foreground">
-                Warga tertunggak
+                Peserta Arisan tertunggak
               </p>
             </CardContent>
           </Card>
@@ -112,9 +112,9 @@ export default function Dashboard() {
                 <Coins className="h-6 w-6 text-accent" />
                 <span className="text-xs">Undian Arisan</span>
               </Button>
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/warga')}>
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/peserta-arisan')}>
                 <Users className="h-6 w-6 text-warning" />
-                <span className="text-xs">Data Warga</span>
+                <span className="text-xs">Data Peserta Arisan</span>
               </Button>
               <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/laporan')}>
                 <FileText className="h-6 w-6 text-success" />
