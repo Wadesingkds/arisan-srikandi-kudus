@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      hasil_undian: {
+        Row: {
+          anggota_id: string | null
+          id: string
+          kategori: string
+          keterangan: string | null
+          periode_id: string | null
+          status_konfirmasi: string
+          tanggal_undian: string | null
+        }
+        Insert: {
+          anggota_id?: string | null
+          id?: string
+          kategori: string
+          keterangan?: string | null
+          periode_id?: string | null
+          status_konfirmasi?: string
+          tanggal_undian?: string | null
+        }
+        Update: {
+          anggota_id?: string | null
+          id?: string
+          kategori?: string
+          keterangan?: string | null
+          periode_id?: string | null
+          status_konfirmasi?: string
+          tanggal_undian?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hasil_undian_anggota_id_fkey"
+            columns: ["anggota_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "hasil_undian_periode_id_fkey"
+            columns: ["periode_id"]
+            isOneToOne: false
+            referencedRelation: "periode_undian"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kategori_iuran: {
         Row: {
           id: number
@@ -32,6 +77,80 @@ export type Database = {
           nama?: string
           nominal?: number
           wajib?: boolean | null
+        }
+        Relationships: []
+      }
+      pengeluaran_rt: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          deskripsi: string
+          id: string
+          kategori: string
+          nominal: number
+          penerima_id: string | null
+          penerima_nama: string | null
+          tanggal: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          deskripsi: string
+          id?: string
+          kategori: string
+          nominal: number
+          penerima_id?: string | null
+          penerima_nama?: string | null
+          tanggal: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          deskripsi?: string
+          id?: string
+          kategori?: string
+          nominal?: number
+          penerima_id?: string | null
+          penerima_nama?: string | null
+          tanggal?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pengeluaran_rt_penerima_id_fkey"
+            columns: ["penerima_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      periode_undian: {
+        Row: {
+          created_at: string | null
+          id: string
+          nama: string
+          tanggal_mulai: string
+          tanggal_selesai: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nama: string
+          tanggal_mulai: string
+          tanggal_selesai?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nama?: string
+          tanggal_mulai?: string
+          tanggal_selesai?: string | null
         }
         Relationships: []
       }
