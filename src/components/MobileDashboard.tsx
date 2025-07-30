@@ -17,7 +17,8 @@ import {
   Home,
   Wallet,
   History,
-  UserCheck
+  UserCheck,
+  CreditCard
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
@@ -40,6 +41,7 @@ export default function MobileDashboard({ className }: MobileDashboardProps) {
   const quickActions = [
     { icon: Users, label: 'Data Peserta', path: '/peserta-arisan', color: 'bg-blue-500' },
     { icon: PiggyBank, label: 'Catat Setoran', path: '/setoran', color: 'bg-green-500' },
+    { icon: CreditCard, label: 'Catat Pengeluaran', path: '/pengeluaran', color: 'bg-red-500' },
     { icon: Dices, label: 'Undian Arisan', path: '/undian', color: 'bg-purple-500' },
     { icon: FileText, label: 'Laporan', path: '/laporan', color: 'bg-orange-500' }
   ];
@@ -48,6 +50,7 @@ export default function MobileDashboard({ className }: MobileDashboardProps) {
     { icon: Home, label: 'Beranda', path: '/', active: true },
     { icon: Users, label: 'Peserta', path: '/peserta-arisan', active: false },
     { icon: Wallet, label: 'Setoran', path: '/setoran', active: false },
+    { icon: CreditCard, label: 'Pengeluaran', path: '/pengeluaran', active: false },
     { icon: History, label: 'Riwayat', path: '/laporan', active: false }
   ];
 
@@ -245,7 +248,7 @@ export default function MobileDashboard({ className }: MobileDashboardProps) {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-5 gap-1">
           {bottomNavItems.map((item, index) => (
             <Button
               key={index}
