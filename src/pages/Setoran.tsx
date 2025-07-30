@@ -82,30 +82,6 @@ const Setoran = () => {
           </div>
         </div>
 
-        {/* Filter */}
-        <div className="flex gap-4 mb-6">
-          <Select>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Pilih bulan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2024-01">Januari 2024</SelectItem>
-              <SelectItem value="2024-02">Februari 2024</SelectItem>
-              <SelectItem value="2024-03">Maret 2024</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Jenis iuran" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bulanan">Iuran Bulanan</SelectItem>
-              <SelectItem value="arisan">Arisan</SelectItem>
-              <SelectItem value="kebersihan">Kebersihan</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Content */}
         <Card>
           <CardHeader>
