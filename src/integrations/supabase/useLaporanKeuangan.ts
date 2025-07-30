@@ -108,11 +108,11 @@ export function useDetailSetoran(bulan?: string) {
       
       return data?.map(item => ({
         id: item.id,
-        bulan: item.bulan,
+        bulan: item.bulan || '',
         jenis_iuran: item.jenis_iuran || '',
-        nominal: item.nominal,
+        nominal: item.nominal || 0,
         created_at: item.created_at || '',
-        nama_peserta: item.profiles?.nama || '',
+        nama_peserta: item.profiles?.nama || 'Tidak Diketahui',
         no_wa: item.profiles?.no_wa || '',
       })) || [];
     },
@@ -130,15 +130,15 @@ export function useDetailTabungan() {
           profiles!inner(nama, no_wa)
         `)
         .order('tanggal', { ascending: false });
-      
+       
       if (error) throw error;
       
       return data?.map(item => ({
         id: item.id,
         jenis: item.jenis || '',
-        nominal: item.nominal,
+        nominal: item.nominal || 0,
         tanggal: item.tanggal || '',
-        nama_peserta: item.profiles?.nama || '',
+        nama_peserta: item.profiles?.nama || 'Tidak Diketahui',
         no_wa: item.profiles?.no_wa || '',
       })) || [];
     },
@@ -155,15 +155,16 @@ export function useRekapBulanan() {
     queryKey: ['rekap-bulanan'],
     queryFn: async () => {
       // Group setoran by month
-      const { data: setoranData, error: setoranError } = await supabase
+      const { data: rekapData, error: rekapError } = await supabase
         .from('setoran')
-        .select('bulan, nominal, created_at');
+        .select('bulan, nominal')
+        .order('bulan', { ascending: false });
       
-      if (setoranError) throw setoranError;
+      if (rekapError) throw rekapError;
       
       const monthlyData: { [key: string]: { pemasukan: number; pengeluaran: number; transaksi: number } } = {};
       
-      setoranData?.forEach(item => {
+      rekapData?.forEach(item => {
         const bulan = item.bulan;
         if (!monthlyData[bulan]) {
           monthlyData[bulan] = { pemasukan: 0, pengeluaran: 0, transaksi: 0 };
