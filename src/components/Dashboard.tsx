@@ -3,13 +3,34 @@ import { Button } from "@/components/atoms/Button";
 import { Badge } from "@/components/atoms/Badge";
 import { Container, Grid, Main } from "@/components/layouts/Layout";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { FileText, TrendingUp, Users, DollarSign, Trophy, Calendar, Upload, Download, PiggyBank, Coins, CreditCard, Plus, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, TrendingUp, Users, DollarSign, Trophy, Calendar, Upload, Download, PiggyBank, Coins, CreditCard, Plus, AlertCircle, MessageCircle, Phone, CheckCircle2, Settings } from "lucide-react";
 import DrawModal from "./DrawModal";
+import { whatsappService } from "@/lib/whatsapp";
+import ApiSettings from "./ApiSettings";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [showDrawModal, setShowDrawModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [selectedDebt, setSelectedDebt] = useState(null);
+  const [reminderMethod, setReminderMethod] = useState('whatsapp');
+  const [customMessage, setCustomMessage] = useState('');
   const [winner, setWinner] = useState('');
 
   const handleDrawLottery = () => {
@@ -19,29 +40,159 @@ export default function Dashboard() {
     setShowDrawModal(true);
   };
 
+  const handleReminderClick = (debt: any) => {
+    setSelectedDebt(debt);
+    setCustomMessage(generateDefaultMessage(debt));
+    setShowReminderModal(true);
+  };
+
+  const generateDefaultMessage = (debt: any) => {
+    return `Assalamualaikum ${debt.name.split(' ')[0]},\n\n` +
+           `Ini pengingat untuk pembayaran arisan RT 04 RW 01:\n` +
+           `Tunggakan: ${debt.debt}\n` +
+           `Jumlah: ${debt.amount}\n\n` +
+           `Mohon segera diselesaikan. Terima kasih.\n\n` +
+           `Salam,\nKetua Arisan RT 04 RW 01`;
+  };
+
+  const [sentReminders, setSentReminders] = useState<Set<string>>(new Set());
+  const [sendingStatus, setSendingStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [apiStatus, setApiStatus] = useState<'configured' | 'not_configured'>('not_configured');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings'>('dashboard');
+
+  // Check WhatsApp API configuration on mount and when settings change
+  useEffect(() => {
+    const checkApiConfig = () => {
+      const savedSettings = localStorage.getItem('arisanApiSettings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        const config = {
+          apiKey: settings.apiKey || '',
+          apiUrl: settings.apiUrl || '',
+          sender: settings.sender || ''
+        };
+        
+        whatsappService.updateConfig(config);
+        
+        const isConfigured = whatsappService.isConfigured();
+        setApiStatus(isConfigured ? 'configured' : 'not_configured');
+        
+        console.log('Loaded WhatsApp config from storage:', {
+          apiKey: config.apiKey ? '***' + config.apiKey.slice(-4) : 'empty',
+          apiUrl: config.apiUrl,
+          sender: config.sender,
+          isConfigured
+        });
+      } else {
+        setApiStatus('not_configured');
+      }
+    };
+
+    checkApiConfig();
+    
+    // Listen for storage changes
+    window.addEventListener('storage', checkApiConfig);
+    return () => window.removeEventListener('storage', checkApiConfig);
+  }, []);
+
+  const handleApiConfigured = (configured: boolean) => {
+    setApiStatus(configured ? 'configured' : 'not_configured');
+    if (configured) {
+      setActiveTab('dashboard');
+    }
+  };
+
+  const sendReminder = async () => {
+    if (!selectedDebt) return;
+    
+    setSendingStatus('sending');
+    
+    try {
+      const name = selectedDebt.name.split(' ')[0];
+      const message = whatsappService.generateReminderMessage(
+        name,
+        selectedDebt.debt,
+        selectedDebt.amount
+      );
+      
+      const success = await whatsappService.sendTextMessage(
+        selectedDebt.phone,
+        customMessage || message
+      );
+      
+      if (success) {
+        const reminderId = `${selectedDebt.name}-${Date.now()}`;
+        setSentReminders(prev => new Set(prev).add(reminderId));
+        setSendingStatus('success');
+      } else {
+        setSendingStatus('error');
+      }
+    } catch (error) {
+      console.error('Failed to send reminder:', error);
+      setSendingStatus('error');
+    }
+    
+    setTimeout(() => {
+      setShowReminderModal(false);
+      setSendingStatus('idle');
+    }, 2000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <Container>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard Arisan RT 04 RW 01</h1>
-              <p className="text-gray-600 mt-1">Kelola arisan Demaan Kudus dengan mudah dan efisien</p>
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <Container>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Dashboard Arisan RT 04 RW 01</h1>
+                <p className="text-gray-600 mt-1">Kelola arisan Demaan Kudus dengan mudah dan efisien</p>
+              </div>
+              <div className="text-sm text-gray-500">
+                {new Date().toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </div>
             </div>
-            <div className="text-sm text-gray-500">
-              {new Date().toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-              })}
+            
+            {/* Tab Navigation */}
+            <div className="border-t border-gray-200 pt-4">
+              <nav className="flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'dashboard'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'settings'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Settings className="h-4 w-4" />
+                  Pengaturan API
+                  {apiStatus === 'not_configured' && (
+                    <span className="ml-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+              </nav>
             </div>
-          </div>
-        </Container>
-      </header>
+          </Container>
+        </header>
 
-      {/* Main Content */}
-      <Main>
+        {/* Main Content */}
+        {activeTab === 'dashboard' && (
+          <Main>
         {/* Summary Cards */}
         <Grid cols={4} gap={6}>
           <Card variant="elevated">
@@ -322,35 +473,58 @@ export default function Dashboard() {
         {/* Tunggakan */}
         <Card variant="elevated">
           <CardHeader>
-            <CardTitle>Tunggakan</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Tunggakan</span>
+              <Badge variant="default" className="ml-2 bg-red-500 text-white">3</Badge>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {[{
+              id: "ibu-dewi",
               name: "Ibu Dewi (D.04-15)",
               debt: "Kas Nov, Listrik Nov",
-              amount: "Rp 10.000"
+              amount: "Rp 10.000",
+              phone: "81234567890"
             }, {
+              id: "pak-ahmad",
               name: "Pak Ahmad (D.04-22)",
               debt: "Kas Okt-Nov, Dana Sosial Nov",
-              amount: "Rp 12.000"
+              amount: "Rp 12.000",
+              phone: "81234567891"
             }, {
+              id: "ibu-sri",
               name: "Ibu Sri (D.04-07)",
               debt: "Listrik Nov",
-              amount: "Rp 5.000"
-            }].map((debt, index) => (
-              <div key={index} className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{debt.name}</p>
-                  <p className="text-xs text-muted-foreground">{debt.debt}</p>
+              amount: "Rp 5.000",
+              phone: "81234567892"
+            }].map((debt, index) => {
+              const isRecentlyReminded = Array.from(sentReminders).some(id => 
+                id.includes(debt.name.split(' ')[0])
+              );
+              
+              return (
+                <div key={debt.id} className="flex justify-between items-center p-4 bg-destructive/5 rounded-lg mb-3 last:mb-0">
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{debt.name}</p>
+                    <p className="text-xs text-muted-foreground">{debt.debt}</p>
+                    <p className="text-xs text-gray-500 mt-1">📱 {debt.phone}</p>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <p className="text-sm font-medium text-destructive">{debt.amount}</p>
+                    <Button 
+                      size="sm" 
+                      variant={isRecentlyReminded ? "secondary" : "outline"}
+                      className="text-xs h-7 px-2 gap-1"
+                      onClick={() => handleReminderClick(debt)}
+                      disabled={isRecentlyReminded}
+                    >
+                      <MessageCircle className="h-3 w-3" />
+                      {isRecentlyReminded ? "Terkirim" : "Kirim"}
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-destructive">{debt.amount}</p>
-                  <Button size="sm" variant="outline" className="mt-1 text-xs h-6">
-                    Reminder
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
 
@@ -363,7 +537,129 @@ export default function Dashboard() {
             onRedraw={handleDrawLottery}
           />
         )}
-      </Main>
+
+        {/* Reminder Modal */}
+        <Dialog open={showReminderModal} onOpenChange={setShowReminderModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Kirim Pengingat Pembayaran</DialogTitle>
+              <DialogDescription>
+                Kirim pengingat kepada {selectedDebt?.name} untuk pembayaran tunggakan
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Metode Pengiriman</label>
+                <Select value={reminderMethod} onValueChange={setReminderMethod}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="whatsapp">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="h-4 w-4" />
+                        WhatsApp
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="sms">
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        SMS
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Pesan</label>
+                <Textarea
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                  rows={6}
+                  className="text-sm"
+                  placeholder="Tulis pesan pengingat..."
+                />
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-lg text-xs text-blue-800">
+                <strong>Info:</strong> Pesan akan dikirim ke nomor WhatsApp/SMS yang terdaftar.
+              </div>
+            </div>
+
+            {apiStatus === 'not_configured' && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start">
+                  <AlertCircle className="h-4 w-4 text-yellow-600 mr-2 mt-0.5" />
+                  <div className="text-sm text-yellow-800">
+                    <strong>Info:</strong> WhatsApp API belum dikonfigurasi. 
+                    <br />Silakan tambahkan environment variables untuk fitur ini.
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex gap-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowReminderModal(false)}
+                className="flex-1"
+                disabled={sendingStatus === 'sending'}
+              >
+                Batal
+              </Button>
+              <Button 
+                onClick={sendReminder}
+                className="flex-1"
+                disabled={sendingStatus === 'sending' || apiStatus === 'not_configured'}
+              >
+                {sendingStatus === 'sending' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Mengirim...
+                  </>
+                ) : sendingStatus === 'success' ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Terkirim
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Kirim Notifikasi
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {sendingStatus === 'success' && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center text-green-800">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
+                  Notifikasi berhasil dikirim ke {selectedDebt?.name} via WhatsApp!
+                </div>
+              </div>
+            )}
+            
+            {sendingStatus === 'error' && (
+              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center text-red-800">
+                  <AlertCircle className="h-4 w-4 text-red-500 mr-2" />
+                  Gagal mengirim notifikasi. Silakan coba lagi.
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+        </Main>
+        )}
+
+        {activeTab === 'settings' && (
+          <Main>
+            <ApiSettings onApiConfigured={handleApiConfigured} />
+          </Main>
+        )}
     </div>
   );
 }
