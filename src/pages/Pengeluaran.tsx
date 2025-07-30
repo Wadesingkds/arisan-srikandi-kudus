@@ -16,7 +16,7 @@ export default function Pengeluaran() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [kategoriFilter, setKategoriFilter] = useState("");
+  const [kategoriFilter, setKategoriFilter] = useState("all");
   
   const { data: allPengeluaran, isLoading } = usePengeluaranRT();
   const { data: totalByKategori } = useTotalPengeluaranByKategori();
@@ -52,14 +52,14 @@ export default function Pengeluaran() {
         item.penerima?.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.penerima_nama?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesKategori = !kategoriFilter || item.kategori === kategoriFilter;
+      const matchesKategori = kategoriFilter === "all" || item.kategori === kategoriFilter;
       
       return matchesSearch && matchesKategori;
     });
   }, [allPengeluaran, searchTerm, kategoriFilter]);
 
   const kategoriOptions = [
-    { value: "", label: "Semua Kategori" },
+    { value: "all", label: "Semua Kategori" },
     { value: "arisan_uang", label: "Arisan Uang" },
     { value: "arisan_barang", label: "Arisan Barang" },
     { value: "sosial", label: "Sosial" },
