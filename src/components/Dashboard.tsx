@@ -146,6 +146,21 @@ export default function Dashboard() {
 
           <Card variant="elevated">
             <CardHeader>
+              <CardTitle>Penarikan Tabungan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Proses penarikan tabungan kolektif
+              </CardDescription>
+              <Button variant="outline" onClick={() => navigate('/penarikan-tabungan')}>
+                <DollarSign className="mr-2 h-4 w-4" />
+                Penarikan Kolektif
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated">
+            <CardHeader>
               <CardTitle>Pengeluaran</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
