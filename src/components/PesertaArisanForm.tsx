@@ -130,7 +130,8 @@ export default function PesertaArisanForm({ open, onClose, initialData }: Props)
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="peserta">Peserta Biasa</SelectItem>
-                <SelectItem value="ketua_rt">Ketua</SelectItem>
+                <SelectItem value="Ketua">Ketua</SelectItem>
+                <SelectItem value="ketua_rt">Ketua RT</SelectItem>
                 <SelectItem value="bendahara">Bendahara</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>
