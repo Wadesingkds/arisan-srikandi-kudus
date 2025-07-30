@@ -159,9 +159,19 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
 
   const handleNominalChange = (pesertaId: string, value: string) => {
     const nominal = parseInt(value) || 0;
-    setWithdrawalItems(prev => prev.map(item => 
-      item.peserta_id === pesertaId ? { ...item, nominal } : item
-    ));
+    setWithdrawalItems(prev => 
+      prev.map(item => 
+        item.peserta_id === pesertaId ? { ...item, nominal } : item
+      )
+    );
+  };
+
+  const handleSetFullAmount = (pesertaId: string) => {
+    setWithdrawalItems(prev => 
+      prev.map(item => 
+        item.peserta_id === pesertaId ? { ...item, nominal: item.saldo } : item
+      )
+    );
   };
 
   const handleSubmit = async () => {
@@ -283,37 +293,61 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
 
           {/* Participants List */}
           <div className="border rounded-lg">
-            <div className="bg-gray-50 p-4 font-semibold flex items-center justify-between">
-              <span>Daftar Peserta</span>
-              <span>Saldo Tabungan</span>
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <p className="text-blue-800">
+                <strong>Catatan:</strong> Proses ini akan mengurangi saldo tabungan peserta dan otomatis mencatat sebagai pengeluaran kas RT. 
+                <br />• <strong>Full withdrawal:</strong> Mengambil seluruh saldo (default)
+                <br />• <strong>Partial withdrawal:</strong> Bisa diubah nominalnya per peserta
+              </p>
             </div>
-            
             <div className="max-h-96 overflow-y-auto">
-              {withdrawalItems.map((item) => (
-                <div key={item.peserta_id} className="flex items-center gap-4 p-4 border-b last:border-b-0">
-                  <Checkbox 
-                    checked={item.selected}
-                    onCheckedChange={(checked) => handleSelectItem(item.peserta_id, checked as boolean)}
-                  />
-                  
-                  <div className="flex-1">
-                    <p className="font-medium">{item.nama}</p>
-                    <p className="text-sm text-gray-600">
-                      Saldo: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.saldo)}
-                    </p>
-                  </div>
-
-                  <div className="w-32">
-                    <Input 
-                      type="number"
-                      value={item.nominal}
-                      onChange={(e) => handleNominalChange(item.peserta_id, e.target.value)}
-                      disabled={!item.selected}
-                      className="text-right"
-                    />
-                  </div>
-                </div>
-              ))}
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="p-3 text-left font-medium">Pilih</th>
+                    <th className="p-3 text-left font-medium">Nama</th>
+                    <th className="p-3 text-left font-medium">Saldo Tabungan</th>
+                    <th className="p-3 text-left font-medium">Penarikan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {withdrawalItems.map((item) => (
+                    <tr key={item.peserta_id} className="border-b hover:bg-gray-50">
+                      <td className="p-3">
+                        <Checkbox
+                          checked={item.selected}
+                          onCheckedChange={(checked) => handleSelectItem(item.peserta_id, checked as boolean)}
+                        />
+                      </td>
+                      <td className="p-3">{item.nama}</td>
+                      <td className="p-3">Rp {item.saldo.toLocaleString('id-ID')}</td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            value={item.nominal}
+                            onChange={(e) => handleNominalChange(item.peserta_id, e.target.value)}
+                            min="0"
+                            max={item.saldo}
+                            className="w-28"
+                            disabled={!item.selected}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSetFullAmount(item.peserta_id)}
+                            className="text-xs"
+                            disabled={!item.selected}
+                          >
+                            Full
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
