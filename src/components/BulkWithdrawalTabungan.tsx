@@ -11,6 +11,7 @@ import { id } from "date-fns/locale";
 import { usePesertaArisan } from "@/integrations/supabase/usePesertaArisan";
 import { useDetailTabungan } from "@/integrations/supabase/useLaporanKeuangan";
 import { useTambahPengeluaranRT } from "@/integrations/supabase/usePengeluaran";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BulkWithdrawalTabunganProps {
   onClose: () => void;
@@ -31,40 +32,119 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
   const [keterangan, setKeterangan] = useState('');
   const [withdrawalItems, setWithdrawalItems] = useState<WithdrawalItem[]>([]);
   const [selectAll, setSelectAll] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: peserta } = usePesertaArisan();
   const { data: allTabungan } = useDetailTabungan();
   const tambahPengeluaran = useTambahPengeluaranRT();
 
-  useEffect(() => {
-    if (peserta && allTabungan) {
-      const filteredTabungan = allTabungan.filter(t => 
-        t.jenis === jenisTabungan && t.nominal > 0
-      );
+  const handleProcessWithdrawal = async () => {
+    const selectedItems = withdrawalItems.filter(item => item.selected && item.nominal > 0);
+    
+    if (selectedItems.length === 0) {
+      alert('Tidak ada penarikan yang dipilih');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const totalPenarikan = selectedItems.reduce((sum, item) => sum + item.nominal, 0);
       
-      // Create a map to track tabungan per peserta
-      const pesertaTabunganMap = new Map();
-      filteredTabungan.forEach(t => {
-        const current = pesertaTabunganMap.get(t.nama_peserta) || 0;
-        pesertaTabunganMap.set(t.nama_peserta, current + t.nominal);
+      // 1. Catat sebagai pengeluaran kas RT menggunakan hook yang ada
+      await tambahPengeluaran.mutateAsync({
+        kategori: jenisTabungan === 'lebaran' ? 'tabungan_lebaran' : 'tabungan_piknik',
+        nominal: totalPenarikan,
+        tanggal,
+        deskripsi: keterangan || `Penarikan tabungan ${jenisTabungan} untuk ${selectedItems.length} peserta: ${selectedItems.map(i => i.nama).join(', ')}`
       });
 
-      const items = peserta
-        .filter(p => pesertaTabunganMap.has(p.nama))
-        .map(p => {
-          const saldo = pesertaTabunganMap.get(p.nama) || 0;
-          return {
-            peserta_id: p.id,
-            nama: p.nama,
-            saldo: saldo,
-            nominal: saldo,
-            selected: true
-          };
-        });
+      // 2. Update saldo tabungan untuk setiap peserta
+      for (const item of selectedItems) {
+        // Cari tabungan yang sesuai
+        const { data: tabunganData } = await supabase
+          .from('tabungan')
+          .select('id, nominal')
+          .eq('jenis', jenisTabungan)
+          .eq('warga_id', item.peserta_id);
 
-      setWithdrawalItems(items);
+        if (tabunganData && tabunganData.length > 0) {
+          const currentTabungan = tabunganData[0];
+          const newNominal = Math.max(0, currentTabungan.nominal - item.nominal);
+
+          await supabase
+            .from('tabungan')
+            .update({ nominal: newNominal })
+            .eq('id', currentTabungan.id);
+        }
+      }
+
+      alert(`Berhasil memproses penarikan tabungan ${jenisTabungan} untuk ${selectedItems.length} peserta`);
+      onSuccess();
+    } catch (error) {
+      console.error('Error processing withdrawal:', error);
+      alert('Gagal memproses penarikan');
+    } finally {
+      setIsProcessing(false);
     }
-  }, [peserta, allTabungan, jenisTabungan]);
+  };
+
+  useEffect(() => {
+    const fetchTabunganData = async () => {
+      if (!peserta || !peserta.length) return;
+
+      try {
+        // Fetch tabungan dengan join ke tabel warga untuk mapping peserta
+        const { data: tabunganData } = await supabase
+          .from('tabungan')
+          .select(`
+            id,
+            jenis,
+            nominal,
+            warga_id
+          `)
+          .eq('jenis', jenisTabungan)
+          .gt('nominal', 0);
+
+        if (tabunganData && tabunganData.length > 0) {
+          // Create peserta map for quick lookup
+          const pesertaMap = new Map();
+          peserta.forEach(p => {
+            pesertaMap.set(p.id, p.nama);
+          });
+
+          // Group tabungan by peserta_id and sum nominal
+          const tabunganMap = new Map();
+          tabunganData.forEach(item => {
+            const current = tabunganMap.get(item.warga_id) || 0;
+            tabunganMap.set(item.warga_id, current + (item.nominal || 0));
+          });
+
+          // Create withdrawal items
+          const items = Array.from(tabunganMap.entries())
+            .filter(([warga_id]) => pesertaMap.has(warga_id))
+            .map(([warga_id, saldo]) => ({
+              peserta_id: warga_id,
+              nama: pesertaMap.get(warga_id) || '',
+              saldo: saldo,
+              nominal: saldo,
+              selected: true
+            }));
+
+          setWithdrawalItems(items);
+        } else {
+          setWithdrawalItems([]);
+        }
+      } catch (error) {
+        console.error('Error fetching tabungan:', error);
+        setWithdrawalItems([]);
+      }
+    };
+
+    if (peserta && peserta.length > 0) {
+      fetchTabunganData();
+    }
+  }, [peserta, jenisTabungan]);
 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
@@ -84,7 +164,7 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
     ));
   };
 
-  const handleProcessWithdrawal = async () => {
+  const handleSubmit = async () => {
     const selectedItems = withdrawalItems.filter(item => item.selected && item.nominal > 0);
     
     if (selectedItems.length === 0) {
@@ -92,29 +172,29 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
       return;
     }
 
+    setIsProcessing(true);
+
     try {
-      // Process each withdrawal
-      for (const item of selectedItems) {
-        // Add to pengeluaran (expense)
-        await tambahPengeluaran.mutateAsync({
-          tanggal,
-          kategori: jenisTabungan === 'lebaran' ? 'tabungan_lebaran' : 'tabungan_piknik',
-          nominal: item.nominal,
-          deskripsi: keterangan || `Penarikan tabungan ${jenisTabungan} untuk ${item.nama}`,
-          penerima_id: item.peserta_id,
-          penerima_nama: item.nama
-        });
+      // 1. Catat sebagai pengeluaran kas RT
+      const totalPenarikan = selectedItems.reduce((sum, item) => sum + item.nominal, 0);
+      
+      await tambahPengeluaran.mutateAsync({
+        tanggal,
+        kategori: jenisTabungan === 'lebaran' ? 'tabungan_lebaran' : 'tabungan_piknik',
+        nominal: totalPenarikan,
+        deskripsi: keterangan || `Penarikan tabungan ${jenisTabungan} untuk ${selectedItems.length} peserta: ${selectedItems.map(i => i.nama).join(', ')}`
+      });
 
-        // Update tabungan balance (this would need to be implemented in the tabungan hooks)
-        // For now, we'll just log it
-        console.log(`Penarikan ${item.nominal} untuk ${item.nama} - ${jenisTabungan}`);
-      }
+      // 2. Update saldo tabungan setiap peserta
+      await updateTabunganSaldo.mutateAsync(selectedItems);
 
-      alert(`Berhasil memproses penarikan tabungan ${jenisTabungan} untuk ${selectedItems.length} peserta`);
+      alert(`Berhasil memproses penarikan tabungan ${jenisTabungan}`);
       onSuccess();
     } catch (error) {
       console.error('Error processing withdrawal:', error);
       alert('Gagal memproses penarikan');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
