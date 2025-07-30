@@ -90,31 +90,36 @@ export function useDetailSetoran(bulan?: string) {
   return useQuery<SetoranDetail[], Error>({
     queryKey: ['detail-setoran', bulan],
     queryFn: async () => {
-      let query = supabase
-        .from('setoran')
-        .select(`
-          *,
-          profiles!inner(nama, no_wa)
-        `)
-        .order('created_at', { ascending: false });
-      
-      if (bulan) {
-        query = query.eq('bulan', bulan);
+      try {
+        let query = supabase
+          .from('setoran')
+          .select(`*, warga(nama, no_wa)`)
+          .order('created_at', { ascending: false });
+        
+        if (bulan) {
+          query = query.eq('bulan', bulan);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('Error fetching setoran:', error);
+          return [];
+        }
+        
+        return data?.map(item => ({
+          id: item.id,
+          bulan: item.bulan || '',
+          jenis_iuran: item.jenis_iuran || '',
+          nominal: item.nominal || 0,
+          created_at: item.created_at || '',
+          nama_peserta: item.warga?.nama || 'Tidak Diketahui',
+          no_wa: item.warga?.no_wa || '',
+        })) || [];
+      } catch (error) {
+        console.error('Error in setoran query:', error);
+        return [];
       }
-      
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      
-      return data?.map(item => ({
-        id: item.id,
-        bulan: item.bulan || '',
-        jenis_iuran: item.jenis_iuran || '',
-        nominal: item.nominal || 0,
-        created_at: item.created_at || '',
-        nama_peserta: item.profiles?.nama || 'Tidak Diketahui',
-        no_wa: item.profiles?.no_wa || '',
-      })) || [];
     },
   });
 }
@@ -123,24 +128,29 @@ export function useDetailTabungan() {
   return useQuery<TabunganDetail[], Error>({
     queryKey: ['detail-tabungan'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tabungan')
-        .select(`
-          *,
-          profiles!inner(nama, no_wa)
-        `)
-        .order('tanggal', { ascending: false });
-       
-      if (error) throw error;
-      
-      return data?.map(item => ({
-        id: item.id,
-        jenis: item.jenis || '',
-        nominal: item.nominal || 0,
-        tanggal: item.tanggal || '',
-        nama_peserta: item.profiles?.nama || 'Tidak Diketahui',
-        no_wa: item.profiles?.no_wa || '',
-      })) || [];
+      try {
+        const { data, error } = await supabase
+          .from('tabungan')
+          .select(`*, warga(nama, no_wa)`)
+          .order('tanggal', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching tabungan:', error);
+          return [];
+        }
+        
+        return data?.map(item => ({
+          id: item.id,
+          jenis: item.jenis || '',
+          nominal: item.nominal || 0,
+          tanggal: item.tanggal || '',
+          nama_peserta: item.warga?.nama || 'Tidak Diketahui',
+          no_wa: item.warga?.no_wa || '',
+        })) || [];
+      } catch (error) {
+        console.error('Error in tabungan query:', error);
+        return [];
+      }
     },
   });
 }
