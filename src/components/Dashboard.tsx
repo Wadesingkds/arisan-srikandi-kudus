@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/atoms/Card";
+import { Button } from "@/components/atoms/Button";
+import { Badge } from "@/components/atoms/Badge";
+import { Container, Grid, Main } from "@/components/layouts/Layout";
 import { useNavigate } from "react-router-dom";
 import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText, CreditCard } from "lucide-react";
 import { useState } from "react";
@@ -17,227 +18,227 @@ export default function Dashboard() {
     setWinner(pemenang);
     setShowDrawModal(true);
   };
-  return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
-        <div className="container mx-auto px-4 py-6 bg-sky-700">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <Container>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Dashboard RT 04 RW 01</h1>
-              <p className="text-primary-foreground/80 text-sm sm:text-base">Demaan, Kudus</p>
+              <h1 className="text-3xl font-bold text-gray-900">Dashboard Arisan</h1>
+              <p className="text-gray-600 mt-1">Kelola arisan dengan mudah dan efisien</p>
             </div>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            <div className="text-sm text-gray-500">
               {new Date().toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            })}
-            </Badge>
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </div>
           </div>
-        </div>
-      </div>
+        </Container>
+      </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        
+      <Main>
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="shadow-card hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Peserta Arisan
+        <Grid cols={4} gap={6}>
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Total Peserta</span>
+                <Users className="h-5 w-5 text-blue-600" />
               </CardTitle>
-              <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">30</div>
-              <p className="text-xs text-success">
-                <span className="inline-flex items-center">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  28 aktif
-                </span>
-              </p>
+              <div className="text-3xl font-bold text-gray-900">8</div>
+              <CardDescription>peserta aktif</CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Saldo Kas
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Setoran Bulan Ini</span>
+                <PiggyBank className="h-5 w-5 text-green-600" />
               </CardTitle>
-              <PiggyBank className="h-4 w-4 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-accent">Rp 850K</div>
-              <p className="text-xs text-muted-foreground">
-                +120K bulan ini
-              </p>
+              <div className="text-3xl font-bold text-gray-900">Rp 96.000</div>
+              <CardDescription>8 peserta × Rp 12.000</CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Arisan Aktif
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Total Undian</span>
+                <Calendar className="h-5 w-5 text-purple-600" />
               </CardTitle>
-              <Coins className="h-4 w-4 text-warning" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-warning">Periode 3</div>
-              <p className="text-xs text-muted-foreground">
-                18 belum menang
-              </p>
+              <div className="text-3xl font-bold text-gray-900">12</div>
+              <CardDescription>sudah dilakukan</CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Tunggakan
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Dana Terkumpul</span>
+                <Coins className="h-5 w-5 text-orange-600" />
               </CardTitle>
-              <AlertTriangle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">5</div>
-              <p className="text-xs text-muted-foreground">
-                Peserta Arisan tertunggak
-              </p>
+              <div className="text-3xl font-bold text-gray-900">Rp 1.440.000</div>
+              <CardDescription>total 12 bulan</CardDescription>
             </CardContent>
           </Card>
-        </div>
+        </Grid>
 
-        {/* Quick Actions */}
-        <Card className="shadow-card">
+        {/* Action Buttons */}
+        <Grid cols={4} gap={6}>
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle>Peserta Arisan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Kelola data peserta arisan
+              </CardDescription>
+              <Button variant="outline" onClick={() => navigate('/warga')}>
+                <Users className="mr-2 h-4 w-4" />
+                Lihat Peserta
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle>Setoran</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Catat setoran peserta
+              </CardDescription>
+              <Button variant="outline" onClick={() => navigate('/setoran')}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                Kelola Setoran
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle>Undian</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Lakukan undian bulanan
+              </CardDescription>
+              <Button variant="outline" onClick={handleDrawLottery}>
+                <Calendar className="mr-2 h-4 w-4" />
+                Lakukan Undian
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle>Laporan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <CardDescription>
+                Lihat laporan keuangan
+              </CardDescription>
+              <Button variant="outline" onClick={() => navigate('/laporan')}>
+                <FileText className="mr-2 h-4 w-4" />
+                Lihat Laporan
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Quick Stats */}
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-primary" />
-              Aksi Cepat
-            </CardTitle>
+            <CardTitle>Ringkasan Cepat</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/setoran')}>
-                <PiggyBank className="h-6 w-6 text-primary" />
-                <span className="text-xs">Catat Setoran</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/undian')}>
-                <Coins className="h-6 w-6 text-accent" />
-                <span className="text-xs">Undian Arisan</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/peserta-arisan')}>
-                <Users className="h-6 w-6 text-warning" />
-                <span className="text-xs">Data Peserta Arisan</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/pengeluaran')}>
-                <CreditCard className="h-6 w-6 text-info" />
-                <span className="text-xs">Pengeluaran</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/laporan')}>
-                <FileText className="h-6 w-6 text-success" />
-                <span className="text-xs">Laporan</span>
-              </Button>
-            </div>
+            <Grid cols={1} gap={4}>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <CardDescription>Peserta Aktif</CardDescription>
+                <Badge variant="success">8 orang</Badge>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <CardDescription>Setoran Bulan Ini</CardDescription>
+                <Badge variant="success">✅ Lunas</Badge>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <CardDescription>Status Undian</CardDescription>
+                <Badge variant="info">📅 Jadwal Teratur</Badge>
+              </div>
+            </Grid>
           </CardContent>
         </Card>
 
-        {/* Recent Activity & Arisan Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Arisan Status */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Status Arisan Bulan Ini
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Arisan Uang</p>
-                    <p className="text-sm text-muted-foreground">Rp 20.000 per orang</p>
-                  </div>
-                  <Badge variant="secondary">Belum undian</Badge>
-                </div>
-                
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Arisan Barang</p>
-                    <p className="text-sm text-muted-foreground">Rp 10.000 per slot</p>
-                  </div>
-                  <Badge variant="secondary">Belum undian</Badge>
-                </div>
-              </div>
-              
-              <Button 
-                variant="default" 
-                className="w-full bg-sky-700 hover:bg-sky-600"
-                onClick={handleDrawLottery}
-              >
-                <Coins className="h-4 w-4 mr-2" />
-                Lakukan Undian
-              </Button>
-              
-              <DrawModal 
-                isOpen={showDrawModal}
-                onClose={() => setShowDrawModal(false)}
-                winner={winner}
-                onRedraw={handleDrawLottery}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Aktivitas Terbaru
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[{
-                time: "2 jam lalu",
-                action: "Setoran kas",
-                person: "Ibu Sari (D.04-12)",
-                amount: "Rp 12.000"
-              }, {
-                time: "5 jam lalu",
-                action: "Arisan menang",
-                person: "Pak Budi (D.04-08)",
-                amount: "Barang"
-              }, {
-                time: "1 hari lalu",
-                action: "Tabungan lebaran",
-                person: "Ibu Rina (D.04-03)",
-                amount: "Rp 50.000"
-              }].map((activity, index) => <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.person}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {activity.amount}
-                    </Badge>
-                  </div>)}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tunggakan Alert */}
-        <Card className="shadow-card border-destructive/20">
+        {/* Recent Activity */}
+        <Card variant="elevated">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              Peringatan Tunggakan
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <span>Aktivitas Terbaru</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[{
+                time: "2 jam lalu",
+                action: "Setoran kas",
+                person: "Ibu Sari (D.04-12)",
+                amount: "Rp 12.000",
+                status: "success"
+              }, {
+                time: "4 jam lalu",
+                action: "Setoran kas",
+                person: "Pak Budi (D.04-12)",
+                amount: "Rp 12.000",
+                status: "success"
+              }, {
+                time: "1 hari lalu",
+                action: "Undian bulanan",
+                person: "Ibu Rina",
+                amount: "Pemenang undian",
+                status: "info"
+              }].map((activity, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      activity.status === 'success' ? 'bg-green-500' : 
+                      activity.status === 'info' ? 'bg-blue-500' : 'bg-gray-500'
+                    }`} />
+                    <div>
+                      <div className="font-medium text-gray-900">{activity.action}</div>
+                      <div className="text-sm text-gray-600">{activity.person}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-900">{activity.amount}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Utang */}
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle>Utang</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {[{
               name: "Ibu Dewi (D.04-15)",
               debt: "Kas Nov, Listrik Nov",
               amount: "Rp 10.000"
@@ -249,22 +250,33 @@ export default function Dashboard() {
               name: "Ibu Sri (D.04-07)",
               debt: "Listrik Nov",
               amount: "Rp 5.000"
-            }].map((debt, index) => <div key={index} className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{debt.name}</p>
-                    <p className="text-xs text-muted-foreground">{debt.debt}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-destructive">{debt.amount}</p>
-                    <Button size="sm" variant="outline" className="mt-1 text-xs h-6">
-                      Reminder
-                    </Button>
-                  </div>
-                </div>)}
-            </div>
+            }].map((debt, index) => (
+              <div key={index} className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{debt.name}</p>
+                  <p className="text-xs text-muted-foreground">{debt.debt}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-destructive">{debt.amount}</p>
+                  <Button size="sm" variant="outline" className="mt-1 text-xs h-6">
+                    Reminder
+                  </Button>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
-      </div>
-    </div>;
+        {/* Draw Modal */}
+        {showDrawModal && (
+          <DrawModal
+            isOpen={showDrawModal}
+            onClose={() => setShowDrawModal(false)}
+            winner={winner}
+            onRedraw={handleDrawLottery}
+          />
+        )}
+      </Main>
+    </div>
+  );
 }
