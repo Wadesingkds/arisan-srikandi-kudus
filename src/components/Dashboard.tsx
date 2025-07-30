@@ -107,7 +107,7 @@ export default function Dashboard() {
               <CardDescription>
                 Kelola data peserta arisan
               </CardDescription>
-              <Button variant="outline" onClick={() => navigate('/warga')}>
+              <Button variant="outline" onClick={() => navigate('/peserta-arisan')}>
                 <Users className="mr-2 h-4 w-4" />
                 Lihat Peserta
               </Button>
@@ -123,7 +123,7 @@ export default function Dashboard() {
                 Catat setoran peserta
               </CardDescription>
               <Button variant="outline" onClick={() => navigate('/setoran')}>
-                <CreditCard className="mr-2 h-4 w-4" />
+                <DollarSign className="mr-2 h-4 w-4" />
                 Kelola Setoran
               </Button>
             </CardContent>
