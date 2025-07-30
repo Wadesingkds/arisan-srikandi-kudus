@@ -176,8 +176,12 @@ export default function Dashboard() {
                 <Badge variant="success">✅ Lunas</Badge>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <CardDescription>Status Undian</CardDescription>
-                <Badge variant="info">📅 Jadwal Teratur</Badge>
+                <CardDescription>Pemenang Terakhir</CardDescription>
+                <Badge variant="info">Ibu Rina (15 Juli 2024)</Badge>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <CardDescription>Jadwal Undian Berikutnya</CardDescription>
+                <Badge variant="warning">15 Agustus 2024</Badge>
               </div>
             </Grid>
           </CardContent>
