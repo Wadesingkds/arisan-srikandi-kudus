@@ -3,8 +3,8 @@ import { Button } from "@/components/atoms/Button";
 import { Badge } from "@/components/atoms/Badge";
 import { Container, Grid, Main } from "@/components/layouts/Layout";
 import { useNavigate } from "react-router-dom";
-import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText, CreditCard } from "lucide-react";
 import { useState } from "react";
+import { FileText, TrendingUp, Users, DollarSign, Calendar, Upload, Download, PiggyBank, Coins, CreditCard } from "lucide-react";
 import DrawModal from "./DrawModal";
 
 export default function Dashboard() {
@@ -187,6 +187,37 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Data Import */}
+        <Card variant="elevated">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-green-600" />
+              <span>Import Data</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <CardDescription>
+              Import data peserta, setoran, atau tunggakan dari file CSV
+            </CardDescription>
+            <div className="space-y-3">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/import')}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Import Data Arisan
+              </Button>
+              <div className="text-xs text-gray-500">
+                Download template di: <br />
+                <a href="/templates/template-peserta.csv" className="text-blue-600 hover:underline">Template Peserta</a> | 
+                <a href="/templates/template-setoran.csv" className="text-blue-600 hover:underline">Template Setoran</a> | 
+                <a href="/templates/template-tunggakan.csv" className="text-blue-600 hover:underline">Template Tunggakan</a>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Recent Activity */}
         <Card variant="elevated">
           <CardHeader>
@@ -194,7 +225,7 @@ export default function Dashboard() {
               <TrendingUp className="h-5 w-5 text-blue-600" />
               <span>Aktivitas Terbaru</span>
             </CardTitle>
-          </CardHeader>
+          </CardContent>
           <CardContent>
             <div className="space-y-3">
               {[{

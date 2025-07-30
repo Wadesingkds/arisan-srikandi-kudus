@@ -12,6 +12,8 @@ import Undian from "./pages/Undian";
 import Laporan from "./pages/Laporan";
 import AdminIuran from "@/pages/AdminIuran";
 import Pengeluaran from "./pages/Pengeluaran";
+import Import from "./pages/Import";
+import ManualMigration from "./pages/ManualMigration";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/laporan" element={<Laporan />} />
           <Route path="/admin/iuran" element={<AdminIuran />} />
           <Route path="/pengeluaran" element={<Pengeluaran />} />
+          <Route path="/import" element={<Import />} />
+          <Route path="/manual-migration" element={<ManualMigration />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
