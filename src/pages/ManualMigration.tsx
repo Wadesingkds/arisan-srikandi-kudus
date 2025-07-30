@@ -34,6 +34,11 @@ export default function ManualMigration() {
   const [setoran, setSetoran] = useState<Setoran[]>([]);
   const [pemenang, setPemenang] = useState<Pemenang[]>([]);
   const [tunggakan, setTunggakan] = useState<any[]>([]);
+  const [saldo, setSaldo] = useState({
+    kas: 0,
+    bank: 0,
+    total: 0
+  });
 
   // Step 1: Input Peserta
   const [currentPeserta, setCurrentPeserta] = useState({
@@ -250,7 +255,51 @@ export default function ManualMigration() {
         return (
           <Card variant="elevated">
             <CardHeader>
-              <CardTitle>Step 4: Review & Konfirmasi</CardTitle>
+              <CardTitle>Step 4: Input Saldo Migrasi</CardTitle>
+              <CardDescription>
+                Masukkan saldo yang ada di kas dan rekening bank
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Saldo Kas</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.kas}
+                    onChange={(e) => setSaldo({...saldo, kas: Number(e.target.value), total: Number(e.target.value) + saldo.bank})}
+                  />
+                  <CardDescription>Saldo uang tunai di kas</CardDescription>
+                </div>
+                <div>
+                  <Label>Saldo Bank</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    value={saldo.bank}
+                    onChange={(e) => setSaldo({...saldo, bank: Number(e.target.value), total: Number(e.target.value) + saldo.kas})}
+                  />
+                  <CardDescription>Saldo di rekening bank</CardDescription>
+                </div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Total Saldo</span>
+                </div>
+                <div className="text-2xl font-bold text-blue-600">
+                  Rp {saldo.total.toLocaleString('id-ID')}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 5:
+        return (
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle>Step 5: Review & Konfirmasi</CardTitle>
               <CardDescription>
                 Review semua data sebelum disimpan
               </CardDescription>
@@ -267,6 +316,22 @@ export default function ManualMigration() {
                       {p.nama} - {p.alamat}
                     </div>
                   ))}
+                </div>
+
+                <div>
+                  <h4 className="font-medium flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-blue-600" />
+                    Saldo Migrasi
+                  </h4>
+                  <div className="text-sm text-gray-600">
+                    Saldo Kas: Rp {saldo.kas.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Saldo Bank: Rp {saldo.bank.toLocaleString('id-ID')}
+                  </div>
+                  <div className="text-sm font-medium text-blue-600">
+                    Total: Rp {saldo.total.toLocaleString('id-ID')}
+                  </div>
                 </div>
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">

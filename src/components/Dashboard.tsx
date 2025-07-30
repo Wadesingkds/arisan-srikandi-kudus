@@ -216,6 +216,13 @@ export default function Dashboard() {
                 <Plus className="h-4 w-4" />
                 Input Manual
               </Button>
+              <Button 
+                onClick={() => navigate('/import')}
+                className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Upload className="h-4 w-4" />
+                Import Data CSV
+              </Button>
               <div className="text-xs text-gray-500">
                 Download template di: <br />
                 <a href="/templates/template-peserta.csv" className="text-blue-600 hover:underline">Template Peserta</a> | 
