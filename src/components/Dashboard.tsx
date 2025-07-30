@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText } from "lucide-react";
+import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText, CreditCard } from "lucide-react";
+
 export default function Dashboard() {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
@@ -103,7 +104,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/setoran')}>
                 <PiggyBank className="h-6 w-6 text-primary" />
                 <span className="text-xs">Catat Setoran</span>
@@ -115,6 +116,10 @@ export default function Dashboard() {
               <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/peserta-arisan')}>
                 <Users className="h-6 w-6 text-warning" />
                 <span className="text-xs">Data Peserta Arisan</span>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/pengeluaran')}>
+                <CreditCard className="h-6 w-6 text-info" />
+                <span className="text-xs">Pengeluaran</span>
               </Button>
               <Button variant="outline" className="h-auto py-4 px-3 flex flex-col gap-2" onClick={() => navigate('/laporan')}>
                 <FileText className="h-6 w-6 text-success" />

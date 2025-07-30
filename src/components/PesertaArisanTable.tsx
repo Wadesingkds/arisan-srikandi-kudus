@@ -53,7 +53,7 @@ export default function PesertaArisanTable({ data, isLoading, onEdit }: Props) {
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                    {peserta.role || 'Peserta'}
+                    {peserta.role === 'ketua_rt' ? 'Ketua' : peserta.role === 'bendahara' ? 'Bendahara' : peserta.role === 'admin' ? 'Admin' : 'Peserta'}
                   </span>
                 </td>
                 <td className="px-6 py-4">

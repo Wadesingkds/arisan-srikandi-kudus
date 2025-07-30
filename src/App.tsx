@@ -11,6 +11,7 @@ import Setoran from "./pages/Setoran";
 import Undian from "./pages/Undian";
 import Laporan from "./pages/Laporan";
 import AdminIuran from "@/pages/AdminIuran";
+import Pengeluaran from "./pages/Pengeluaran";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/undian" element={<Undian />} />
           <Route path="/laporan" element={<Laporan />} />
           <Route path="/admin/iuran" element={<AdminIuran />} />
+          <Route path="/pengeluaran" element={<Pengeluaran />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
