@@ -83,7 +83,7 @@ const UndianSlot = () => {
 
   // Statistik undian
   const totalSlots = activeSlots.length;
-  const totalPeserta = new Set(activeSlots.map(slot => slot.warga_id)).size;
+  const totalPeserta = new Set(activeSlots.map(slot => slot.peserta_id)).size;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6">
@@ -162,7 +162,7 @@ const UndianSlot = () => {
                         {slot.alias}
                       </Badge>
                       <div>
-                        <div className="font-medium">{slot.nama_warga}</div>
+                        <div className="font-medium">{slot.nama_peserta}</div>
                         <div className="text-sm text-muted-foreground">
                           {slot.no_wa}
                         </div>

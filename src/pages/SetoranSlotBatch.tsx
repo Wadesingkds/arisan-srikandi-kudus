@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useSlotsByWarga } from "@/integrations/supabase/useSlotArisanBarang";
+import { useSlotsByPeserta } from "@/integrations/supabase/useSlotArisanBarang";
 import { useCreateSetoranSlot } from "@/integrations/supabase/useSetoranSlot";
 import { usePesertaArisan } from "@/integrations/supabase/usePesertaArisan";
 import {
@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { formatCurrency } from "@/lib/utils";
 
 const SetoranSlotBatch = () => {
-  const [selectedWarga, setSelectedWarga] = useState<string>("");
+  const [selectedPeserta, setSelectedPeserta] = useState<string>("");
   const [selectedBulan, setSelectedBulan] = useState<string>("");
   const [slotAmounts, setSlotAmounts] = useState<Record<string, number>>({});
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
@@ -29,7 +29,7 @@ const SetoranSlotBatch = () => {
 
   // Data queries
   const pesertaQuery = usePesertaArisan();
-  const slotsQuery = useSlotsByWarga(selectedWarga);
+  const slotsQuery = useSlotsByPeserta(selectedPeserta);
   const createSetoranMutation = useCreateSetoranSlot();
 
   // Generate bulan options dengan tahun dinamis
@@ -49,7 +49,7 @@ const SetoranSlotBatch = () => {
 
   // Handle batch setoran
   const handleBatchSetoran = () => {
-    if (!selectedWarga || !selectedBulan || selectedSlots.length === 0) {
+    if (!selectedPeserta || !selectedBulan || selectedSlots.length === 0) {
       toast.error("Lengkapi semua data");
       return;
     }
@@ -129,7 +129,7 @@ const SetoranSlotBatch = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label>Peserta Arisan</Label>
-                <Select value={selectedWarga} onValueChange={setSelectedWarga}>
+                <Select value={selectedPeserta} onValueChange={setSelectedPeserta}>
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih peserta..." />
                   </SelectTrigger>
@@ -163,11 +163,11 @@ const SetoranSlotBatch = () => {
         </Card>
 
         {/* Slot Management */}
-        {selectedWarga && (
+        {selectedPeserta && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>
-                Slot Arisan - {activeSlots[0]?.nama_warga || 'Peserta'}
+                Slot Arisan - {activeSlots[0]?.nama_peserta || 'Peserta'}
                 <Badge className="ml-2">{activeSlots.length} slot aktif</Badge>
               </CardTitle>
             </CardHeader>
@@ -208,7 +208,7 @@ const SetoranSlotBatch = () => {
                       <div>
                         <Badge>{slot.alias}</Badge>
                         <div className="text-sm text-muted-foreground">
-                          {slot.nama_warga}
+                          {slot.nama_peserta}
                         </div>
                       </div>
                     </div>

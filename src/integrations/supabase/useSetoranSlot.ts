@@ -12,7 +12,7 @@ export interface SetoranSlot {
   status: 'terbayar' | 'belum_bayar';
   created_at: string;
   updated_at: string;
-  nama_warga?: string;
+  nama_peserta?: string;
   no_wa?: string;
 }
 
@@ -34,7 +34,7 @@ export function useSetoranSlot(bulan?: string) {
           *,
           slot_arisan_barang!inner(
             alias,
-            warga!inner(nama, no_wa)
+            peserta!inner(nama, no_wa)
           )
         `)
         .order('tanggal_setoran', { ascending: false });
@@ -57,8 +57,8 @@ export function useSetoranSlot(bulan?: string) {
         status: item.status || 'belum_bayar',
         created_at: item.created_at || '',
         updated_at: item.updated_at || '',
-        nama_warga: item.slot_arisan_barang?.warga?.nama || 'Tidak Diketahui',
-        no_wa: item.slot_arisan_barang?.warga?.no_wa || '',
+        nama_peserta: item.slot_arisan_barang?.peserta?.nama || 'Tidak Diketahui',
+        no_wa: item.slot_arisan_barang?.peserta?.no_wa || '',
       })) || [];
     },
   });
@@ -89,8 +89,8 @@ export function useCreateSetoranSlot() {
   });
 }
 
-// Hook untuk mendapatkan rekap setoran per warga
-export function useRekapSetoranWarga(bulan?: string) {
+// Hook untuk mendapatkan rekap setoran per peserta
+export function useRekapSetoranPeserta(bulan?: string) {
   return useQuery<{
     warga_id: string;
     nama: string;
@@ -98,10 +98,10 @@ export function useRekapSetoranWarga(bulan?: string) {
     total_setoran: number;
     slot_aktif: string[];
   }[], Error>({
-    queryKey: ['rekap-setoran-warga', bulan],
+    queryKey: ['rekap-setoran-peserta', bulan],
     queryFn: async () => {
       const { data, error } = await supabase
-        .rpc('rekap_setoran_warga_per_bulan', {
+        .rpc('rekap_setoran_peserta_per_bulan', {
           bulan_filter: bulan
         });
 
@@ -138,7 +138,7 @@ export function useSlotsBelumBayar(bulan: string) {
       return data?.map(item => ({
         slot_id: item.id,
         alias: item.alias,
-        warga_id: item.warga_id,
+        peserta_id: item.peserta_id,
         nama: item.warga?.nama || 'Tidak Diketahui',
         nominal_harus_bayar: 10000, // Default untuk arisan barang
       })) || [];

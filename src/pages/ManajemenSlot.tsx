@@ -26,7 +26,7 @@ import {
 
 const ManajemenSlot = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedWarga, setSelectedWarga] = useState<string>("");
+  const [selectedPeserta, setSelectedPeserta] = useState<string>("");
   const [aliasInput, setAliasInput] = useState<string>("");
   
   // Data queries
@@ -37,18 +37,18 @@ const ManajemenSlot = () => {
 
   // Handler untuk membuat slot baru
   const handleCreateSlot = () => {
-    if (!selectedWarga || !aliasInput.trim()) {
+    if (!selectedPeserta || !aliasInput.trim()) {
       toast.error("Silakan pilih peserta dan masukkan alias");
       return;
     }
 
     createSlotMutation.mutate({
-      warga_id: selectedWarga,
+      peserta_id: selectedPeserta,
       alias: aliasInput.trim(),
     });
 
     setOpenModal(false);
-    setSelectedWarga("");
+    setSelectedPeserta("");
     setAliasInput("");
   };
 
@@ -67,11 +67,11 @@ const ManajemenSlot = () => {
   };
 
   // Hitung jumlah slot per peserta
-  const slotsPerWarga = slotsQuery.data?.reduce((acc, slot) => {
-    if (!acc[slot.warga_id]) {
-      acc[slot.warga_id] = [];
+  const slotsPerPeserta = slotsQuery.data?.reduce((acc, slot) => {
+    if (!acc[slot.peserta_id]) {
+      acc[slot.peserta_id] = [];
     }
-    acc[slot.warga_id].push(slot);
+    acc[slot.peserta_id].push(slot);
     return acc;
   }, {} as Record<string, typeof slotsQuery.data>) || {};
 
@@ -115,7 +115,7 @@ const ManajemenSlot = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Object.keys(slotsPerWarga).length}
+                {Object.keys(slotsPerPeserta).length}
               </div>
             </CardContent>
           </Card>
@@ -126,8 +126,8 @@ const ManajemenSlot = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Object.keys(slotsPerWarga).length > 0 
-                  ? Math.round((slotsQuery.data?.length || 0) / Object.keys(slotsPerWarga).length)
+                {Object.keys(slotsPerPeserta).length > 0 
+                  ? Math.round((slotsQuery.data?.length || 0) / Object.keys(slotsPerPeserta).length)
                   : 0
                 }
               </div>
@@ -138,7 +138,7 @@ const ManajemenSlot = () => {
         {/* Daftar Slot per Peserta */}
         <div className="grid gap-6">
           {pesertaQuery.data?.map((peserta) => {
-            const pesertaSlots = slotsPerWarga[peserta.id] || [];
+            const pesertaSlots = slotsPerPeserta[peserta.id] || [];
             
             return (
               <Card key={peserta.id}>
@@ -195,7 +195,7 @@ const ManajemenSlot = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Pilih Peserta</label>
-                <Select value={selectedWarga} onValueChange={setSelectedWarga}>
+                <Select value={selectedPeserta} onValueChange={setSelectedPeserta}>
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih peserta..." />
                   </SelectTrigger>
@@ -233,7 +233,7 @@ const ManajemenSlot = () => {
               </Button>
               <Button 
                 onClick={handleCreateSlot}
-                disabled={!selectedWarga || !aliasInput.trim()}
+                disabled={!selectedPeserta || !aliasInput.trim()}
               >
                 Buat Slot
               </Button>

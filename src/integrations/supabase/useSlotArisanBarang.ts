@@ -11,7 +11,7 @@ export interface SlotArisanBarang {
   tanggal_nonaktif: string | null;
   created_at: string;
   updated_at: string;
-  nama_warga?: string;
+  nama_peserta?: string;
   no_wa?: string;
 }
 
@@ -36,21 +36,21 @@ export function useActiveSlots() {
   });
 }
 
-// Hook untuk mendapatkan slot berdasarkan warga
-export function useSlotsByWarga(wargaId: string) {
+// Hook untuk mendapatkan slot berdasarkan peserta
+export function useSlotsByPeserta(pesertaId: string) {
   return useQuery<SlotArisanBarang[], Error>({
-    queryKey: ['slots-by-warga', wargaId],
+    queryKey: ['slots-by-peserta', pesertaId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('slot_arisan_barang')
         .select(`*, warga(nama, no_wa)`)
-        .eq('warga_id', wargaId)
+        .eq('peserta_id', pesertaId)
         .order('alias', { ascending: true });
 
       if (error) throw error;
       return data || [];
     },
-    enabled: !!wargaId,
+    enabled: !!pesertaId,
   });
 }
 

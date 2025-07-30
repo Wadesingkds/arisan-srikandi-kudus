@@ -38,7 +38,7 @@ export default function MobileDashboard({ className }: MobileDashboardProps) {
   };
 
   const quickActions = [
-    { icon: Users, label: 'Data Warga', path: '/warga', color: 'bg-blue-500' },
+    { icon: Users, label: 'Data Peserta', path: '/peserta-arisan', color: 'bg-blue-500' },
     { icon: PiggyBank, label: 'Catat Setoran', path: '/setoran', color: 'bg-green-500' },
     { icon: Dices, label: 'Undian Arisan', path: '/undian', color: 'bg-purple-500' },
     { icon: FileText, label: 'Laporan', path: '/laporan', color: 'bg-orange-500' }
@@ -46,7 +46,7 @@ export default function MobileDashboard({ className }: MobileDashboardProps) {
 
   const bottomNavItems = [
     { icon: Home, label: 'Beranda', path: '/', active: true },
-    { icon: Users, label: 'Warga', path: '/warga', active: false },
+    { icon: Users, label: 'Peserta', path: '/peserta-arisan', active: false },
     { icon: Wallet, label: 'Setoran', path: '/setoran', active: false },
     { icon: History, label: 'Riwayat', path: '/laporan', active: false }
   ];

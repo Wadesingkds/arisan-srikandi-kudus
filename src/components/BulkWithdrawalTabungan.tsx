@@ -66,7 +66,7 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
           .from('tabungan')
           .select('id, nominal')
           .eq('jenis', jenisTabungan)
-          .eq('warga_id', item.peserta_id);
+          .eq('peserta_id', item.peserta_id);
 
         if (tabunganData && tabunganData.length > 0) {
           const currentTabungan = tabunganData[0];
@@ -94,14 +94,14 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
       if (!peserta || !peserta.length) return;
 
       try {
-        // Fetch tabungan dengan join ke tabel warga untuk mapping peserta
+        // Fetch tabungan dengan join ke tabel peserta untuk mapping peserta
         const { data: tabunganData } = await supabase
           .from('tabungan')
           .select(`
             id,
             jenis,
             nominal,
-            warga_id
+            peserta_id
           `)
           .eq('jenis', jenisTabungan)
           .gt('nominal', 0);
@@ -116,16 +116,16 @@ export default function BulkWithdrawalTabungan({ onClose, onSuccess }: BulkWithd
           // Group tabungan by peserta_id and sum nominal
           const tabunganMap = new Map();
           tabunganData.forEach(item => {
-            const current = tabunganMap.get(item.warga_id) || 0;
-            tabunganMap.set(item.warga_id, current + (item.nominal || 0));
+            const current = tabunganMap.get(item.peserta_id) || 0;
+            tabunganMap.set(item.peserta_id, current + (item.nominal || 0));
           });
 
           // Create withdrawal items
           const items = Array.from(tabunganMap.entries())
-            .filter(([warga_id]) => pesertaMap.has(warga_id))
-            .map(([warga_id, saldo]) => ({
-              peserta_id: warga_id,
-              nama: pesertaMap.get(warga_id) || '',
+            .filter(([peserta_id]) => pesertaMap.has(peserta_id))
+            .map(([peserta_id, saldo]) => ({
+              peserta_id: peserta_id,
+              nama: pesertaMap.get(peserta_id) || '',
               saldo: saldo,
               nominal: saldo,
               selected: true

@@ -38,7 +38,7 @@ const Setoran = () => {
     try {
       const promises = selectedAnggota.map(anggotaId => 
         createSetoranMutation.mutateAsync({
-          warga_id: anggotaId,
+          peserta_id: anggotaId,
           jenis_iuran: jenisIuran,
           nominal: jumlah,
           tanggal: tanggal
