@@ -4,7 +4,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Container, Grid, Main } from "@/components/layouts/Layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FileText, TrendingUp, Users, DollarSign, Calendar, Upload, Download, PiggyBank, Coins, CreditCard } from "lucide-react";
+import { FileText, TrendingUp, Users, DollarSign, Trophy, Calendar, Upload, Download, PiggyBank, Coins, CreditCard, Plus } from "lucide-react";
 import DrawModal from "./DrawModal";
 
 export default function Dashboard() {
@@ -197,16 +197,24 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <CardDescription>
-              Import data peserta, setoran, atau tunggakan dari file CSV
+              Pilih metode migrasi data yang sesuai
             </CardDescription>
             <div className="space-y-3">
               <Button 
                 variant="outline" 
-                onClick={() => navigate('/import')}
+                onClick={() => navigate('/peserta-arisan')}
+                className="w-full"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Lihat Peserta
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/manual-migration')}
                 className="w-full flex items-center justify-center gap-2"
               >
-                <Upload className="h-4 w-4" />
-                Import Data Arisan
+                <Plus className="h-4 w-4" />
+                Input Manual
               </Button>
               <div className="text-xs text-gray-500">
                 Download template di: <br />
@@ -225,7 +233,7 @@ export default function Dashboard() {
               <TrendingUp className="h-5 w-5 text-blue-600" />
               <span>Aktivitas Terbaru</span>
             </CardTitle>
-          </CardContent>
+          </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[{

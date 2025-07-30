@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/atoms/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/atoms/Card';
 import { Container, Main } from '@/components/layouts/Layout';
@@ -27,6 +28,7 @@ interface Pemenang {
 }
 
 export default function ManualMigration() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [peserta, setPeserta] = useState<Peserta[]>([]);
   const [setoran, setSetoran] = useState<Setoran[]>([]);
@@ -79,6 +81,8 @@ export default function ManualMigration() {
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
+  const goBack = () => navigate('/');
+  const goToDashboard = () => navigate('/');
 
   const renderStep = () => {
     switch (step) {
@@ -325,17 +329,26 @@ export default function ManualMigration() {
             <div className="flex justify-between mt-6">
               <Button 
                 variant="outline" 
-                onClick={prevStep} 
-                disabled={step === 1}
+                onClick={() => navigate('/')} 
+                className="flex items-center gap-2"
               >
-                Kembali
+                ← Kembali ke Dashboard
               </Button>
-              <Button 
-                onClick={nextStep}
-                disabled={step === 4}
-              >
-                {step === 4 ? 'Selesai' : 'Lanjut'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep} 
+                  disabled={step === 1}
+                >
+                  Kembali
+                </Button>
+                <Button 
+                  onClick={nextStep}
+                  disabled={step === 3}
+                >
+                  {step === 3 ? 'Selesai' : 'Lanjut'}
+                </Button>
+              </div>
             </div>
           </div>
         </Container>
