@@ -3,9 +3,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Users, PiggyBank, Coins, TrendingUp, Calendar, AlertTriangle, Plus, FileText, CreditCard } from "lucide-react";
+import { useState } from "react";
+import DrawModal from "./DrawModal";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [showDrawModal, setShowDrawModal] = useState(false);
+  const [winner, setWinner] = useState('');
+
+  const handleDrawLottery = () => {
+    const peserta = ['Ibu Sari', 'Pak Budi', 'Ibu Rina', 'Pak Ahmad', 'Ibu Dewi', 'Ibu Ani', 'Pak Joko', 'Ibu Murni'];
+    const pemenang = peserta[Math.floor(Math.random() * peserta.length)];
+    setWinner(pemenang);
+    setShowDrawModal(true);
+  };
   return <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
@@ -158,10 +169,21 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <Button variant="default" className="w-full bg-sky-700 hover:bg-sky-600">
+              <Button 
+                variant="default" 
+                className="w-full bg-sky-700 hover:bg-sky-600"
+                onClick={handleDrawLottery}
+              >
                 <Coins className="h-4 w-4 mr-2" />
                 Lakukan Undian
               </Button>
+              
+              <DrawModal 
+                isOpen={showDrawModal}
+                onClose={() => setShowDrawModal(false)}
+                winner={winner}
+                onRedraw={handleDrawLottery}
+              />
             </CardContent>
           </Card>
 
