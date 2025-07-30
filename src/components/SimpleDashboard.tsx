@@ -15,7 +15,8 @@ import {
   MessageCircle, 
   HelpCircle,
   CheckCircle,
-  Trophy
+  Trophy,
+  Upload
 } from 'lucide-react';
 import { 
   PesertaModal, 
@@ -87,6 +88,13 @@ export default function SimpleDashboard() {
       icon: Phone,
       color: "border-orange-200 bg-orange-50 hover:bg-orange-100",
       action: () => setShowKontakModal(true)
+    },
+    {
+      title: "Import Data",
+      description: "Upload data dari Excel/CSV",
+      icon: Upload,
+      color: "border-indigo-200 bg-indigo-50 hover:bg-indigo-100",
+      action: () => window.location.href = '/import'
     }
   ];
 
