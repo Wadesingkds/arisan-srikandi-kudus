@@ -32,21 +32,12 @@ const SetoranSlotBatch = () => {
   const slotsQuery = useSlotsByWarga(selectedWarga);
   const createSetoranMutation = useCreateSetoranSlot();
 
-  // Generate bulan options
+  // Generate bulan options dengan tahun dinamis
+  const currentYear = new Date().getFullYear();
   const bulanOptions = [
-    'Januari 2025',
-    'Februari 2025',
-    'Maret 2025',
-    'April 2025',
-    'Mei 2025',
-    'Juni 2025',
-    'Juli 2025',
-    'Agustus 2025',
-    'September 2025',
-    'Oktober 2025',
-    'November 2025',
-    'Desember 2025'
-  ];
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ].map(bulan => `${bulan} ${currentYear}`);
 
   // Calculate totals
   const activeSlots = slotsQuery.data?.filter(slot => slot.status_aktif) || [];

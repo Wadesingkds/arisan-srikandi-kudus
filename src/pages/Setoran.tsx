@@ -151,11 +151,19 @@ const Setoran = () => {
                       <SelectValue placeholder="Pilih jenis iuran" />
                     </SelectTrigger>
                     <SelectContent>
-                      {kategoriIuran?.map((item) => (
-                        <SelectItem key={item.id} value={item.id.toString()}>
-                          {item.nama} {item.nominal ? `(Rp ${item.nominal.toLocaleString()})` : ''}
-                        </SelectItem>
-                      ))}
+                      {loadingIuran ? (
+                        <SelectItem value="loading">Memuat...</SelectItem>
+                      ) : errorIuran ? (
+                        <SelectItem value="error">Error memuat data</SelectItem>
+                      ) : kategoriIuran && kategoriIuran.length > 0 ? (
+                        kategoriIuran.map((item) => (
+                          <SelectItem key={item.id} value={item.id.toString()}>
+                            {item.nama} - {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="empty">Belum ada data jenis iuran</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 )}
@@ -266,7 +274,7 @@ function CalendarPopover({ tanggal, setTanggal }: { tanggal: string; setTanggal:
               if (date) setTanggal(formatTanggal(date));
               setOpen(false);
             }}
-            locale="id"
+
             initialFocus
           />
         </div>
