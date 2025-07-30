@@ -7,6 +7,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Settings, Key, Save, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { whatsappService } from "@/lib/whatsapp";
 
+// WhatsApp Configuration Utilities
+interface WhatsAppConfigInput {
+  apiKey: string;
+  apiUrl: string;
+  sender?: string;
+  senderNumber?: string;
+  [key: string]: any;
+}
+
+function normalizeSenderField<T extends WhatsAppConfigInput>(config: T): T & { sender: string } {
+  // Jika sender belum ada, dan senderNumber ada → isi sender
+  if (!config.sender && config.senderNumber) {
+    return { ...config, sender: config.senderNumber };
+  }
+  return config as T & { sender: string };
+}
+
 interface ApiSettingsProps {
   onApiConfigured?: (configured: boolean) => void;
 }
@@ -49,9 +66,11 @@ export default function ApiSettings({ onApiConfigured }: ApiSettingsProps) {
       savedAt: new Date().toISOString()
     };
     
-    localStorage.setItem('arisanApiSettings', JSON.stringify(settings));
+    const normalizedConfig = normalizeSenderField(settings);
+    
+    localStorage.setItem('arisanApiSettings', JSON.stringify(normalizedConfig));
     setIsConfigured(true);
-    updateServiceConfig(settings);
+    updateServiceConfig(normalizedConfig);
     
     if (onApiConfigured) {
       onApiConfigured(true);
@@ -140,20 +159,18 @@ export default function ApiSettings({ onApiConfigured }: ApiSettingsProps) {
     }
     
     try {
-      // Simpan konfigurasi untuk testing
-      const tempConfig = {
+      // Normalize config dengan utility function
+      const rawConfig = {
         apiKey: apiKey.trim(),
         apiUrl: apiUrl.trim(),
-        sender: senderNumber.trim()
+        senderNumber: senderNumber.trim()
       };
       
+      const normalizedConfig = normalizeSenderField(rawConfig);
+      
       // Simpan ke localStorage dan update service
-      localStorage.setItem('arisanApiSettings', JSON.stringify(tempConfig));
-      updateServiceConfig({
-        apiKey: tempConfig.apiKey,
-        apiUrl: tempConfig.apiUrl,
-        sender: tempConfig.sender
-      });
+      localStorage.setItem('arisanApiSettings', JSON.stringify(normalizedConfig));
+      updateServiceConfig(normalizedConfig);
       
       // Test dengan service yang sudah diupdate
       const configured = whatsappService.isConfigured();

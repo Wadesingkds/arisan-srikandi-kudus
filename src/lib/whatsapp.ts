@@ -197,12 +197,17 @@ Ketua Arisan RT 04 RW 01`;
     return isValid;
   }
 
-  updateConfig(config: { apiKey: string; apiUrl: string; sender: string }) {
-    this.config = {
-      apiKey: config.apiKey,
-      apiUrl: config.apiUrl,
-      sender: config.sender
-    };
+  updateConfig(config: { apiKey: string; apiUrl: string; sender: string; senderNumber?: string }) {
+    // Patch untuk backward compatibility: senderNumber -> sender
+    if (config.senderNumber && !config.sender) {
+      config.sender = config.senderNumber;
+    }
+    
+    this.config = { ...this.config, ...config };
+    console.log('WhatsApp config updated:', {
+      apiUrl: this.config.apiUrl,
+      sender: this.config.sender ? '***' + this.config.sender.slice(-4) : 'empty'
+    });
   }
 }
 
