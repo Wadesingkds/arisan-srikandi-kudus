@@ -107,7 +107,7 @@ export default function SimpleDashboard() {
             </button>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Arisan Srikandi Kudus
+            Arisan RT 04 RW 01 Demaan Kudus
           </h1>
           <p className="text-lg text-gray-600">
             Mode Sederhana - Mudah digunakan untuk semua peserta
@@ -201,7 +201,7 @@ export default function SimpleDashboard() {
 
           {/* Footer */}
           <div className="text-center text-sm text-gray-500 pt-4">
-            <p>💝 Aplikasi Arisan Srikandi Kudus</p>
+            <p>💝 Aplikasi Arisan RT 04 RW 01 Demaan Kudus</p>
             <p>Untuk kebersamaan yang lebih baik</p>
           </div>
         </div>

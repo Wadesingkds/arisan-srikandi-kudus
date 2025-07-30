@@ -44,7 +44,7 @@ const Laporan = () => {
       exportDate: new Date().toLocaleDateString('id-ID')
     };
     
-    const textContent = `LAPORAN KEUANGAN ARISAN SRIKANDI KUDUS
+    const textContent = `LAPORAN KEUANGAN ARISAN RT 04 RW 01 DEMAAN KUDUS
 Tanggal Export: ${data.exportDate}
 
 RINGKASAN KEUANGAN:

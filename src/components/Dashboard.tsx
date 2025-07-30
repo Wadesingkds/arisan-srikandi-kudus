@@ -26,8 +26,8 @@ export default function Dashboard() {
         <Container>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard Arisan</h1>
-              <p className="text-gray-600 mt-1">Kelola arisan dengan mudah dan efisien</p>
+              <h1 className="text-3xl font-bold text-gray-900">Dashboard Arisan RT 04 RW 01</h1>
+              <p className="text-gray-600 mt-1">Kelola arisan Demaan Kudus dengan mudah dan efisien</p>
             </div>
             <div className="text-sm text-gray-500">
               {new Date().toLocaleDateString('id-ID', {
