@@ -46,7 +46,7 @@ export function usePengeluaranRT() {
         .select(`*, penerima:profiles(nama, no_wa)`)
         .order('tanggal', { ascending: false });
       if (error) throw error;
-      return data as any as PengeluaranRT[];
+      return data as PengeluaranRT[];
     },
   });
 }
@@ -62,7 +62,7 @@ export function useTambahPengeluaranRT() {
         .select()
         .single();
       if (error) throw error;
-      return data as any as PengeluaranRT;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pengeluaran-rt'] });
@@ -82,7 +82,7 @@ export function useEditPengeluaranRT() {
         .select()
         .single();
       if (error) throw error;
-      return data as any as PengeluaranRT;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pengeluaran-rt'] });
@@ -119,7 +119,7 @@ export function usePengeluaranRTByDateRange(startDate: string, endDate: string) 
         .lte('tanggal', endDate)
         .order('tanggal', { ascending: false });
       if (error) throw error;
-      return data as any as PengeluaranRT[];
+      return data as PengeluaranRT[];
     },
     enabled: !!startDate && !!endDate,
   });

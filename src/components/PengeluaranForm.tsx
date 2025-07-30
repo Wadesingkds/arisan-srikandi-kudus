@@ -27,11 +27,11 @@ const kategoriOptions = [
 
 export default function PengeluaranForm({ open, onClose, initialData }: Props) {
   const [tanggal, setTanggal] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [kategori, setKategori] = useState('arisan_uang');
-  const [nominal, setNominal] = useState('');
-  const [deskripsi, setDeskripsi] = useState('');
-  const [penerimaId, setPenerimaId] = useState('');
-  const [penerimaNama, setPenerimaNama] = useState('');
+  const [kategori, setKategori] = useState(initialData?.kategori || 'arisan_uang');
+  const [nominal, setNominal] = useState(initialData?.nominal?.toString() || '');
+  const [deskripsi, setDeskripsi] = useState(initialData?.deskripsi || '');
+  const [penerimaId, setPenerimaId] = useState(initialData?.penerima_id || undefined);
+  const [penerimaNama, setPenerimaNama] = useState(initialData?.penerima_nama || '');
   const [errors, setErrors] = useState<{
     kategori?: string;
     nominal?: string;
@@ -202,7 +202,7 @@ export default function PengeluaranForm({ open, onClose, initialData }: Props) {
               <User className="h-4 w-4" />
               Penerima
             </Label>
-            <Select value={penerimaId} onValueChange={setPenerimaId}>
+            <Select value={penerimaId || undefined} onValueChange={setPenerimaId}>
               <SelectTrigger>
                 <SelectValue placeholder="Pilih penerima (opsional)" />
               </SelectTrigger>
